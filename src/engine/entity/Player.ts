@@ -440,22 +440,23 @@ export default class Player extends PathingEntity {
         //     }
         // }
 
-        this.addXp(PlayerStat.HITPOINTS, 1154); // 10 hp
-        this.addXp(PlayerStat.ATTACK, 1); // 10 hp
-        // for (let stat = 0; stat < this.baseLevels.length; stat++) {
-        //     if (!PlayerStatEnabled[stat]) {
-        //         continue;
-        //     }
+        // this.addXp(PlayerStat.HITPOINTS, 1154); // 10 hp
+        // this.addXp(PlayerStat.ATTACK, 1); // 10 hp
+        for (let stat = 0; stat < this.baseLevels.length; stat++) {
+            if (!PlayerStatEnabled[stat]) {
+                continue;
+            }
 
-        //     if (stat === 3) {
-        //         this.baseLevels[stat] = 10;
-        //         this.levels[stat] = 10;
-        //         continue;
-        //     }
+            if (stat === 3) {
+                this.baseLevels[stat] = 10;
+                this.levels[stat] = 10;
+                this.addXp(PlayerStat.HITPOINTS, 1154);
+                continue;
+            }
 
-        //     this.baseLevels[stat] = 1;
-        //     this.levels[stat] = 1;
-        // }
+            this.baseLevels[stat] = 1;
+            this.levels[stat] = 1;
+        }
     }
 
     cleanup(): void {

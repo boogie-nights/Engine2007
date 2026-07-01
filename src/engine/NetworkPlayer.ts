@@ -160,7 +160,7 @@ export default class NetworkPlayer extends Player {
     updateStats() {
         for (let i = 0; i < this.stats.length; i++) {
             if (this.stats[i] !== this.lastStats[i] || this.levels[i] !== this.lastLevels[i]) {
-                this.write(new UpdateStat(i, this.stats[i], this.levels[i]));
+                this.write(new UpdateStat(i, this.levels[i], this.stats[i]));
                 this.lastStats[i] = this.stats[i];
                 this.lastLevels[i] = this.levels[i];
             }
