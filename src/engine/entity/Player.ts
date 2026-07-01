@@ -74,6 +74,7 @@ import { ChatModePrivate, ChatModePublic, ChatModeTradeDuel } from '#/engine/ent
 import Environment from '#/util/Environment.js';
 import { toDisplayName } from '#/util/JString.js';
 import LinkList from '#/util/LinkList.js';
+import UpdateStat from '#/network/server/model/game/UpdateStat.ts';
 // import { MidiPack } from '#tools/pack/PackFile.js';
 // import UpdateIgnoreList from '#/network/game/server/model/UpdateIgnoreList.js';
 
@@ -572,9 +573,9 @@ export default class Player extends PathingEntity {
         //     this.write(new IfSetTab(this.tabs[i], i));
         // }
         // this.refreshInvs();
-        // for (let i = 0; i < this.stats.length; i++) {
-        //     this.write(new UpdateStat(i, this.stats[i], this.levels[i]));
-        // }
+        for (let i = 0; i < this.stats.length; i++) {
+            this.write(new UpdateStat(i, this.levels[i], this.stats[i]));
+        }
         // this.write(new UpdateRunEnergy(this.runenergy));
         // this.write(new ResetAnims());
         this.moveSpeed = MoveSpeed.INSTANT;
