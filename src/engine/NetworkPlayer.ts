@@ -12,6 +12,7 @@ import GameMessageDecoder from '#/network/client/codec/game/GameMessageDecoder.t
 import type GameServerMessage from '#/network/server/GameServerMessage.ts';
 import GameServerPriority from '#/network/server/prot/game/GameServerPriority.ts';
 import MessageGame from '#/network/server/model/game/MessageGame.ts';
+import UpdateStat from '#/network/server/model/game/UpdateStat.ts';
 
 export default class NetworkPlayer extends Player {
     static serverRepo = new GameServerRepository();
@@ -154,6 +155,16 @@ export default class NetworkPlayer extends Player {
 
     messageGame(message: string) {
         this.write(new MessageGame(message));
+    }
+    
+    updateStats() {
+        for (let i = 0; i < this.stats.length; i++) {
+            if (this.stats[i] !== this.lastStats[i] || this.levels[i] !== this.lastLevels[i]) {
+                this.write(new UpdateStat(i, this.stats[i], this.levels[i]));
+                this.lastStats[i] = this.stats[i];
+                this.lastLevels[i] = this.levels[i];
+            }
+        }
     }
 }
 
