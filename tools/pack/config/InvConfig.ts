@@ -252,9 +252,6 @@ export function pack() {
         return;
     }
 
-    // Gathered per file rather than in one combined blob, so a duplicate inv
-    // id defined in two different .inv files is caught instead of one
-    // silently overwriting the other.
     const invOpsById = new Map<number, InvOpcode[]>();
 
     for (const file of files) {

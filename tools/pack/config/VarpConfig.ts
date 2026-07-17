@@ -112,11 +112,9 @@ export function encodeVarpOps(ops: VarpOpcode[]): Uint8Array {
         } else if (code === 2) {
             buf.p1(Number(payload) & 0xff);
         } else if (code === 4) {
-            // parameterless flag
         } else if (code === 5) {
             buf.p2(Number(payload));
         } else if (code === 6) {
-            // parameterless flag
         } else if (code === 250) {
             buf.pjstr(String(payload ?? ''));
         } else {

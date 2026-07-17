@@ -292,7 +292,6 @@ function main() {
             console.warn(`No existing loc group for l${mapXZ} in the current master index - new map squares aren't supported by this script`);
         }
 
-        // server-side flat files (uncompressed, read directly by GameMap.init())
         if (landBytes) {
             fs.writeFileSync(path.join(SERVER_MAPS_DIR, `m${mapXZ}`), landBytes);
         }

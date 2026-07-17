@@ -294,10 +294,6 @@ export function loadNameToIdMap(packFileName: string): Map<string, number> {
     return result;
 }
 
-// Mirrors PackShared.ts's readDirTree/findFiles: walk once into a flat Set of
-// every file path, then filter that set by extension. Splitting it this way
-// means readConfigFile can be called for several different extensions in the
-// same run without re-walking CONFIG_DIR each time (see getConfigDirTree).
 export function readDirTree(dirTree: Set<string>, dirPath: string): void {
     const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
@@ -337,17 +333,10 @@ function getConfigDirTree(): Set<string> {
     return cachedConfigDirTree;
 }
 
-// For packers that need raw file paths rather than merged [name] blocks —
-// e.g. ones with their own multi-line-aware parser (obj, inv) instead of
-// using readConfigFile directly. Shares the same cached tree as
-// readConfigFile, so mixing calls to both in one run still only walks
-// BUILD_SRC_DIR/scripts once.
 export function findConfigFiles(extension: string): Set<string> {
     return findFiles(getConfigDirTree(), extension);
 }
 
-// Scans BUILD_SRC_DIR/scripts for every file ending in `extension` and
-// merges all their [name] blocks into one map.
 export function readConfigFile(extension: string): Map<string, string[]> {
     const blocks = new Map<string, string[]>();
     const files = findFiles(getConfigDirTree(), extension);
@@ -359,10 +348,6 @@ export function readConfigFile(extension: string): Map<string, string[]> {
         let currentLines: string[] = [];
 
         for (const raw of rawLines) {
-            // Only strip a trailing \r (CRLF files) — never trim the value
-            // side of key=value, since some values (e.g. enum string data)
-            // can carry meaningful leading/trailing whitespace that the
-            // unpacker wrote verbatim from buf.gjstr().
             const line = raw.endsWith('\r') ? raw.slice(0, -1) : raw;
             const trimmed = line.trim();
 

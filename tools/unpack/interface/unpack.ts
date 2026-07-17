@@ -736,9 +736,6 @@ interface ScriptTerm {
     args: (string | number)[];
 }
 
-// Opcode -> symbolic name, matching pack.ts's encodeScriptTerm exactly.
-// Kept as one source of truth via this naming so a term round-trips as
-// "opName,arg1,arg2" with no parens (comma-separated, per the new format).
 function disassembleIfScriptTerms(
     ints: Int32Array,
     objNames: Map<number, string>,
@@ -808,10 +805,6 @@ function disassembleIfScriptTerms(
         } else if (op === 20) {
             pushTerm('num', [ints[i++]]);
         } else {
-            // Unrecoverable: operand count for this opcode is unknown, so
-            // any following ints would be misread as new opcodes. Matches
-            // the same fallback the old disassembler used; pack.ts's
-            // encoder will refuse to re-encode "unknown_opN" (as before).
             pushTerm(`unknown_op${op}`);
         }
     }
@@ -852,9 +845,6 @@ const COMPARATOR_NAMES: Record<number, string> = {
 
 function formatScriptTerm(term: ScriptTerm): string {
     const parts: string[] = [];
-    // Operator prefix only when it's not the default '+', to keep the
-    // common single/first-term case clean (matches the plain
-    // "opName,arg1,arg2" form with no operator field).
     if (term.operator !== '+') {
         parts.push(term.operator === '-' ? 'sub' : term.operator === '*' ? 'mul' : 'div');
     }
@@ -873,9 +863,6 @@ function emitConditions(
     const condCount = comp.scriptComparator?.length ?? 0;
     const scriptCount = comp.scripts?.length ?? 0;
 
-    // Conditions: script{n}=comparatorName,operand always present for
-    // n in [1, condCount]. Its own opK lines are present only if a
-    // script actually exists at that index (script index < scriptCount).
     for (let i = 0; i < condCount; i++) {
         const n = i + 1;
         const comparatorName = COMPARATOR_NAMES[comp.scriptComparator![i]] ?? `cmp${comp.scriptComparator![i]}`;
@@ -890,8 +877,6 @@ function emitConditions(
         }
     }
 
-    // Bare trailing scripts (scriptCount > condCount): opK lines only,
-    // no comparator line — these have no associated condition.
     for (let i = condCount; i < scriptCount; i++) {
         const n = i + 1;
         const script = comp.scripts![i];
