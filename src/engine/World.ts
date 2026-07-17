@@ -8,13 +8,13 @@ import { PlayerInfoProt } from '#/network/rsbuf/index.ts'
 import kleur from 'kleur';
 
 // lostcity
-// import CategoryType from '#/cache/config/CategoryType.js';
+import CategoryType from '#/cache/config/CategoryType.js';
 import Component from '#/cache/config/Component.js';
 // import DbRowType from '#/cache/config/DbRowType.js';
 // import DbTableType from '#/cache/config/DbTableType.js';
 import EnumType from '#/cache/config/EnumType.js';
 // import FontType from '#/cache/config/FontType.js';
-// import HuntType from '#/cache/config/HuntType.js';
+import HuntType from '#/cache/config/HuntType.js';
 // import IdkType from '#/cache/config/IdkType.js';
 import InvType from '#/cache/config/InvType.js';
 import LocType from '#/cache/config/LocType.js';
@@ -25,7 +25,7 @@ import ParamType from '#/cache/config/ParamType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import SeqType from '#/cache/config/SeqType.js';
 // import SpotanimType from '#/cache/config/SpotanimType.js';
-// import StructType from '#/cache/config/StructType.js';
+import StructType from '#/cache/config/StructType.js';
 import VarNpcType from '#/cache/config/VarNpcType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.js';
 import VarSharedType from '#/cache/config/VarSharedType.js';
@@ -233,8 +233,7 @@ class World {
     reload(clearInvs: boolean = true): void {
         // IdkType.load('data/pack');
         // SpotanimType.load('data/pack');
-        // CategoryType.load('data/pack');
-        // StructType.load('data/pack');
+        CategoryType.load('data/pack');
 
         if (clearInvs) {
             this.invs.clear();
@@ -260,7 +259,6 @@ class World {
         // DbTableType.load('data/pack');
         // DbRowType.load('data/pack');
         // DbTableIndex.init();
-        // HuntType.load('data/pack');
 
         if (this.vars.length !== VarSharedType.count) {
             const old = this.vars;
@@ -333,6 +331,11 @@ class World {
             VarSharedType.load(varsIndex);
         }
 
+        const huntIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 9: 'hunt.pack' });
+        if (huntIndex.isGroupValid(9)) {
+            HuntType.load(huntIndex);
+        }
+
         const paramIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [11]);
         if (paramIndex) {
             ParamType.load(paramIndex);
@@ -341,6 +344,11 @@ class World {
         const varpIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [16]);
         if (varpIndex) {
             VarPlayerType.load(varpIndex);
+        }
+
+        const structIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [26]);
+        if (structIndex) {
+            StructType.load(structIndex);
         }
 
         const VarbIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(22);
@@ -649,16 +657,16 @@ class World {
         // - npc hunt players if not busy
         for (const npc of this.npcs) {
             // Check if npc is alive
-            // if (npc.isActive) {
-            //     // Hunts will process even if the npc is delayed during this portion
-            //     if (npc.huntMode !== -1 && rsbuf.getNpcObservers(npc.nid) > 0) {
-            //         const hunt = HuntType.get(npc.huntMode);
+            if (npc.isActive) {
+                // Hunts will process even if the npc is delayed during this portion
+                if (npc.huntMode !== -1 && rsbuf.getNpcObservers(npc.nid) > 0) {
+                    const hunt = HuntType.get(npc.huntMode);
 
-            //         if (hunt && hunt.type === HuntModeType.PLAYER) {
-            //             npc.huntAll();
-            //         }
-            //     }
-            // }
+                    if (hunt && hunt.type === HuntModeType.PLAYER) {
+                        npc.huntAll();
+                    }
+                }
+            }
         }
 
         this.cycleStats[WorldStat.WORLD] = Date.now() - start;

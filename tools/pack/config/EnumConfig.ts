@@ -214,6 +214,7 @@ type ParsedEnum = {
     outputTypeName: string | null;
     isAutoint: boolean;
     defaultRaw: string | null;
+    transmit: boolean;
     vals: Array<{ key?: string; value: string }>;
 };
 
@@ -223,6 +224,7 @@ function parseEnumBlock(name: string, lines: string[]): ParsedEnum {
         outputTypeName: null,
         isAutoint: false,
         defaultRaw: null,
+        transmit: false,
         vals: []
     };
 
@@ -245,7 +247,8 @@ function parseEnumBlock(name: string, lines: string[]): ParsedEnum {
             parsed.outputTypeName = value.trim();
         } else if (key === 'default') {
             parsed.defaultRaw = value;
-        } else if (key === 'clientside') {
+        } else if (key === 'transmit') {
+            parsed.transmit = value.trim() === 'yes';
         } else if (key === 'val') {
             if (parsed.isAutoint) {
                 parsed.vals.push({ value: value });
@@ -398,7 +401,9 @@ export function pack() {
 
         try {
             serverEncodedGroups.get(groupId)!.set(fileId, encodeEnum(name, parsed, name));
-            clientEncodedGroups.get(groupId)!.set(fileId, encodeEnum(name, parsed));
+            if (parsed.transmit) {
+                clientEncodedGroups.get(groupId)!.set(fileId, encodeEnum(name, parsed));
+            }
         } catch (err) {
             console.error(`Failed to encode enum [${name}]:`, err);
         }

@@ -18,7 +18,7 @@ import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import ScriptPointer, { ActiveNpc, ActivePlayer, checkedHandler } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
 import ScriptState from '#/engine/script/ScriptState.js';
-import { check, CoordValid, DurationValid, HitTypeValid, HuntVisValid, ParamTypeValid, NpcModeValid, NpcStatValid, NpcTypeValid, NumberNotNull, QueueValid } from '#/engine/script/ScriptValidator.js';
+import { check, CategoryTypeValid, CoordValid, DurationValid, HitTypeValid, HuntVisValid, HuntTypeValid, ParamTypeValid, NpcModeValid, NpcStatValid, NpcTypeValid, NumberNotNull, QueueValid } from '#/engine/script/ScriptValidator.js';
 import ServerTriggerType from '#/engine/script/ServerTriggerType.js';
 import World from '#/engine/World.js';
 
@@ -177,13 +177,13 @@ const NpcOps: CommandHandlers = {
 
     [ScriptOpcode.NPC_SETHUNTMODE]: checkedHandler(ActiveNpc, state => {
         // // TODO is this authentic? or is there npc_clearhuntmode (or similar)?
-        // const huntTypeId = state.popInt();
+        const huntTypeId = state.popInt();
 
-        // if (huntTypeId === -1) {
-        //     state.activeNpc.huntMode = -1;
-        // } else {
-        //     state.activeNpc.huntMode = check(huntTypeId, HuntTypeValid).id;
-        // }
+        if (huntTypeId === -1) {
+            state.activeNpc.huntMode = -1;
+        } else {
+            state.activeNpc.huntMode = check(huntTypeId, HuntTypeValid).id;
+        }
     }),
 
     // https://x.com/JagexAsh/status/1795184135327089047
@@ -321,36 +321,36 @@ const NpcOps: CommandHandlers = {
         state.pushInt(1);
     },
     [ScriptOpcode.NPC_FINDCAT]: state => {
-        // const [coord, npcCategory, distance, checkVis] = state.popInts(4);
+        const [coord, npcCategory, distance, checkVis] = state.popInts(4);
 
-        // const position: CoordGrid = check(coord, CoordValid);
-        // check(npcCategory, CategoryTypeValid);
-        // check(distance, NumberNotNull);
-        // const huntvis: HuntVis = check(checkVis, HuntVisValid);
+        const position: CoordGrid = check(coord, CoordValid);
+        check(npcCategory, CategoryTypeValid);
+        check(distance, NumberNotNull);
+        const huntvis: HuntVis = check(checkVis, HuntVisValid);
 
-        // let closestNpc;
-        // let closestDistance = Number.MAX_SAFE_INTEGER;
+        let closestNpc;
+        let closestDistance = Number.MAX_SAFE_INTEGER;
 
-        // const npcs = new NpcIterator(World.currentTick, position.level, position.x, position.z, distance, huntvis, NpcIteratorType.DISTANCE);
+        const npcs = new NpcIterator(World.currentTick, position.level, position.x, position.z, distance, huntvis, NpcIteratorType.DISTANCE);
 
-        // for (const npc of npcs) {
-        //     if (npc && NpcType.get(npc.type).category === npcCategory) {
-        //         // Picks the smallest euclidean distance
-        //         const npcDistance = CoordGrid.euclideanSquaredDistance(position, npc);
-        //         if (npcDistance <= closestDistance) {
-        //             closestNpc = npc;
-        //             closestDistance = npcDistance;
-        //         }
-        //     }
-        // }
-        // if (!closestNpc) {
-        //     state.pushInt(0);
-        //     return;
-        // }
+        for (const npc of npcs) {
+            if (npc && NpcType.get(npc.type).category === npcCategory) {
+                // Picks the smallest euclidean distance
+                const npcDistance = CoordGrid.euclideanSquaredDistance(position, npc);
+                if (npcDistance <= closestDistance) {
+                    closestNpc = npc;
+                    closestDistance = npcDistance;
+                }
+            }
+        }
+        if (!closestNpc) {
+            state.pushInt(0);
+            return;
+        }
 
-        // state.activeNpc = closestNpc;
-        // state.pointerAdd(ActiveNpc[state.intOperand]);
-        // state.pushInt(1);
+        state.activeNpc = closestNpc;
+        state.pointerAdd(ActiveNpc[state.intOperand]);
+        state.pushInt(1);
     },
 
     // https://x.com/JagexAsh/status/1796878374398246990

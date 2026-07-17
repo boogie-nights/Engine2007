@@ -287,7 +287,7 @@ function unpack() {
                 }
 
                 if (keys.length > 0) {
-                    def.push(`clientside=yes`);
+                    def.push(`transmit=yes`);
                 }
 
                 for (let j = 0; j < keys.length; j++) {

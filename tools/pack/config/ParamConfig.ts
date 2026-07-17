@@ -33,7 +33,8 @@ const TYPE_PACK_FILE: Partial<Record<string, string>> = {
     spotanim: 'spotanim.pack',
     idkit: 'idkit.pack',
     dbrow: 'dbrow.pack',
-    midi: 'midi.pack'
+    midi: 'midi.pack',
+    enum: 'enum.pack'
 };
 
 const nameToIdCache = new Map<string, Map<string, number> | null>();
@@ -174,44 +175,81 @@ function resolveComponentValue(raw: string): number {
 
 const NPC_STATS = ['hitpoints', 'attack', 'strength', 'defence', 'magic', 'ranged'];
 
-function encodeTypedValue(typeCode: number, raw: string): number {
-    if (typeCode === ScriptVarType.INT || typeCode === ScriptVarType.AUTOINT) {
-        return parseInt(raw, 10);
-    }
-
+export function lookupParamValue(typeCode: number, raw: string): number | string | null {
     if (raw === 'null') {
-        return -1;
+        return typeCode === ScriptVarType.STRING ? '' : -1;
     }
 
-    if (typeCode === ScriptVarType.COMPONENT) {
-        return resolveComponentValue(raw);
+    if (typeCode === ScriptVarType.INT) {
+        let n: number;
+        if (raw.startsWith('0x')) {
+            if (!/^-?[0-9a-fA-F]+$/.test(raw.slice(2))) return null;
+            n = parseInt(raw, 16);
+        } else {
+            if (!/^-?[0-9]+$/.test(raw)) return null;
+            n = parseInt(raw, 10);
+        }
+        return Number.isNaN(n) ? null : n;
+    }
+
+    if (typeCode === ScriptVarType.STRING) {
+        return raw.length > 1000 ? null : raw;
+    }
+
+    if (typeCode === ScriptVarType.BOOLEAN) {
+        if (raw !== 'yes' && raw !== 'no' && raw !== 'true' && raw !== 'false' && raw !== '1' && raw !== '0') {
+            return null;
+        }
+        return (raw === 'yes' || raw === 'true' || raw === '1') ? 1 : 0;
+    }
+
+    if (typeCode === ScriptVarType.COORD) {
+        const parts = raw.split('_');
+        if (parts.length !== 5) return null;
+
+        const level = parseInt(parts[0], 10);
+        const mX = parseInt(parts[1], 10);
+        const mZ = parseInt(parts[2], 10);
+        const lX = parseInt(parts[3], 10);
+        const lZ = parseInt(parts[4], 10);
+
+        if ([level, mX, mZ, lX, lZ].some(n => Number.isNaN(n))) return null;
+        if (lZ < 0 || lX < 0 || mZ < 0 || mX < 0 || level < 0) return null;
+        if (lZ > 63 || lX > 63 || mZ > 255 || mX > 255 || level > 3) return null;
+
+        const x = (mX << 6) + lX;
+        const z = (mZ << 6) + lZ;
+        return z | (x << 14) | (level << 28);
     }
 
     if (typeCode === ScriptVarType.STAT) {
         const id = getStatNameToId().get(raw);
-        if (id !== undefined) return id;
-        const n = Number(raw);
-        if (Number.isFinite(n)) return n;
-        throw new Error(`Unknown stat name: ${raw}`);
+        return id !== undefined ? id : null;
     }
 
     if (typeCode === ScriptVarType.NPC_STAT) {
         const id = NPC_STATS.indexOf(raw);
-        if (id !== -1) return id;
-        const n = Number(raw);
-        if (Number.isFinite(n)) return n;
-        throw new Error(`Unknown npc_stat name: ${raw}`);
+        return id !== -1 ? id : null;
+    }
+
+    if (typeCode === ScriptVarType.COMPONENT) {
+        try {
+            return resolveComponentValue(raw);
+        } catch {
+            return null;
+        }
+    }
+
+    if (typeCode === ScriptVarType.INTERFACE) {
+        if (raw.indexOf(':') !== -1) return null;
+        const id = nameToIdForType('interface')?.get(raw);
+        return id !== undefined ? id : null;
     }
 
     const typeName = ScriptVarType.getType(typeCode);
     const nameToId = nameToIdForType(typeName);
-    const fromMap = nameToId?.get(raw);
-    if (fromMap !== undefined) return fromMap;
-
-    const n = Number(raw);
-    if (Number.isFinite(n)) return n;
-
-    throw new Error(`Unknown ${typeName} name: ${raw}`);
+    const id = nameToId?.get(raw);
+    return id !== undefined ? id : null;
 }
 
 export type ParamOpcode = {
@@ -250,16 +288,17 @@ function parseParamFields(name: string, lines: string[]): ParamOpcode[] {
                 throw new Error(`Param [${name}] has 'default' but no 'type' was found`);
             }
 
-            if (value.trim() === 'null') {
-                if (typeCode === ScriptVarType.STRING) {
-                    ops.push({ code: 5, payload: '' });
-                } else {
-                    ops.push({ code: 2, payload: -1 });
-                }
-            } else if (typeCode === ScriptVarType.STRING) {
-                ops.push({ code: 5, payload: value });
+            const raw = typeCode === ScriptVarType.STRING ? value : value.trim();
+            const paramValue = lookupParamValue(typeCode, raw);
+
+            if (paramValue === null) {
+                throw new Error(`Param [${name}] has invalid default value: ${value}`);
+            }
+
+            if (typeCode === ScriptVarType.STRING) {
+                ops.push({ code: 5, payload: paramValue as string });
             } else {
-                ops.push({ code: 2, payload: encodeTypedValue(typeCode, value.trim()) });
+                ops.push({ code: 2, payload: paramValue as number });
             }
         }
     }

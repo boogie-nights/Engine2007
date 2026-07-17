@@ -2,7 +2,7 @@ import { NpcInfoProt } from '#/network/rsbuf/index.ts';
 import * as rsbuf from '#/network/rsbuf/index.ts';
 import { CollisionFlag, CollisionType } from '@2004scape/rsmod-pathfinder';
 
-// import HuntType from '#/cache/config/HuntType.js';
+import HuntType from '#/cache/config/HuntType.js';
 import NpcType from '#/cache/config/NpcType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import SeqType from '#/cache/config/SeqType.js';
@@ -157,19 +157,19 @@ export default class Npc extends PathingEntity {
         }
 
         // Process partial hunt logic
-        // if (this.huntMode !== -1) {
-        //     const hunt = HuntType.get(this.huntMode);
+        if (this.huntMode !== -1) {
+            const hunt = HuntType.get(this.huntMode);
 
-        //     if (hunt.nobodyNear !== HuntNobodyNear.PAUSEHUNT || rsbuf.getNpcObservers(this.nid) > 0 || hunt.type === HuntModeType.PLAYER) {
-        //         // - hunt npc/obj/loc
-        //         if (hunt && hunt.type !== HuntModeType.PLAYER) {
-        //             this.huntAll();
-        //         }
+            if (hunt.nobodyNear !== HuntNobodyNear.PAUSEHUNT || rsbuf.getNpcObservers(this.nid) > 0 || hunt.type === HuntModeType.PLAYER) {
+                // - hunt npc/obj/loc
+                if (hunt && hunt.type !== HuntModeType.PLAYER) {
+                    this.huntAll();
+                }
 
-        //         // Increment huntclock
-        //         this.huntClock++;
-        //     }
-        // }
+                // Increment huntclock
+                this.huntClock++;
+            }
+        }
 
         // Set target from hunt
         this.consumeHuntTarget();
@@ -250,34 +250,34 @@ export default class Npc extends PathingEntity {
     huntAll(): void {
         this.huntTarget = null;
 
-        // const hunt: HuntType = HuntType.get(this.huntMode);
+        const hunt: HuntType = HuntType.get(this.huntMode);
 
-        // // If a huntrate is defined, this acts as a throttle
-        // if (this.huntClock < hunt.rate - 1) {
-        //     return;
-        // }
+        // If a huntrate is defined, this acts as a throttle
+        if (this.huntClock < hunt.rate - 1) {
+            return;
+        }
 
-        // // If no hunt, just return
-        // if (hunt.type === HuntModeType.OFF || this.huntrange < 1) {
-        //     return;
-        // }
+        // If no hunt, just return
+        if (hunt.type === HuntModeType.OFF || this.huntrange < 1) {
+            return;
+        }
 
-        // let hunted: Entity[];
-        // if (hunt.type === HuntModeType.PLAYER) {
-        //     hunted = this.huntPlayers(hunt);
-        // } else if (hunt.type === HuntModeType.NPC) {
-        //     hunted = this.huntNpcs(hunt);
-        // } else if (hunt.type === HuntModeType.OBJ) {
-        //     hunted = this.huntObjs(hunt);
-        // } else {
-        //     hunted = this.huntLocs(hunt);
-        // }
+        let hunted: Entity[];
+        if (hunt.type === HuntModeType.PLAYER) {
+            hunted = this.huntPlayers(hunt);
+        } else if (hunt.type === HuntModeType.NPC) {
+            hunted = this.huntNpcs(hunt);
+        } else if (hunt.type === HuntModeType.OBJ) {
+            hunted = this.huntObjs(hunt);
+        } else {
+            hunted = this.huntLocs(hunt);
+        }
 
-        // // Pick randomly from the hunted entities
-        // if (hunted.length > 0) {
-        //     const entity: Entity = hunted[Math.floor(Math.random() * hunted.length)];
-        //     this.huntTarget = entity;
-        // }
+        // Pick randomly from the hunted entities
+        if (hunted.length > 0) {
+            const entity: Entity = hunted[Math.floor(Math.random() * hunted.length)];
+            this.huntTarget = entity;
+        }
     }
 
     // Very awkward function - needs to be reworked
@@ -887,104 +887,104 @@ export default class Npc extends PathingEntity {
     // --- Hunt helpers
 
     private consumeHuntTarget() {
-        // const hunt: HuntType = HuntType.get(this.huntMode);
+        const hunt: HuntType = HuntType.get(this.huntMode);
 
-        // // We need a huntTarget and a huntMode
-        // if (!this.huntTarget || hunt.type === HuntModeType.OFF) {
-        //     return;
-        // }
+        // We need a huntTarget and a huntMode
+        if (!this.huntTarget || hunt.type === HuntModeType.OFF) {
+            return;
+        }
 
-        // // Findnewmode runs a Queue trigger rather than setting the interaction
-        // if (NpcMode.QUEUE1 <= hunt.findNewMode && hunt.findNewMode <= NpcMode.QUEUE20) {
-        //     const npcType = NpcType.get(this.type);
-        //     const script = ScriptProvider.getByTrigger(ServerTriggerType.AI_QUEUE1 + (hunt.findNewMode - NpcMode.QUEUE1), npcType.id, npcType.category);
+        // Findnewmode runs a Queue trigger rather than setting the interaction
+        if (NpcMode.QUEUE1 <= hunt.findNewMode && hunt.findNewMode <= NpcMode.QUEUE20) {
+            const npcType = NpcType.get(this.type);
+            const script = ScriptProvider.getByTrigger(ServerTriggerType.AI_QUEUE1 + (hunt.findNewMode - NpcMode.QUEUE1), npcType.id, npcType.category);
 
-        //     if (script) {
-        //         const state = ScriptRunner.init(script, this, null, null);
-        //         ScriptRunner.execute(state);
-        //     }
-        // } else {
-        //     // Set the interaction
-        //     this.setInteraction(Interaction.SCRIPT, this.huntTarget, hunt.findNewMode);
-        // }
+            if (script) {
+                const state = ScriptRunner.init(script, this, null, null);
+                ScriptRunner.execute(state);
+            }
+        } else {
+            // Set the interaction
+            this.setInteraction(Interaction.SCRIPT, this.huntTarget, hunt.findNewMode);
+        }
 
-        // // Clear target
-        // this.huntTarget = null;
-        // this.huntClock = 0;
+        // Clear target
+        this.huntTarget = null;
+        this.huntClock = 0;
 
-        // // In osrs, and in this 2005: https://youtu.be/8AFed6tyOp8?t=231
-        // // Once an npc finds a huntTarget, it will no longer hunt until its interactions are cleared
-        // if (!hunt.findKeepHunting) {
-        //     this.huntMode = -1;
-        //     return;
-        // }
+        // In osrs, and in this 2005: https://youtu.be/8AFed6tyOp8?t=231
+        // Once an npc finds a huntTarget, it will no longer hunt until its interactions are cleared
+        if (!hunt.findKeepHunting) {
+            this.huntMode = -1;
+            return;
+        }
     }
 
-    // private huntPlayers(hunt: HuntType): Entity[] {
-    //     const type: NpcType = NpcType.get(this.type);
-    //     const players: Entity[] = [];
-    //     const hunted: HuntIterator = new HuntIterator(World.currentTick, this.level, this.x, this.z, this.huntrange, hunt.checkVis, -1, -1, HuntModeType.PLAYER);
+    private huntPlayers(hunt: HuntType): Entity[] {
+        const type: NpcType = NpcType.get(this.type);
+        const players: Entity[] = [];
+        const hunted: HuntIterator = new HuntIterator(World.currentTick, this.level, this.x, this.z, this.huntrange, hunt.checkVis, -1, -1, HuntModeType.PLAYER);
 
-    //     for (const player of hunted) {
-    //         if (!(player instanceof Player)) {
-    //             throw new Error('[Npc] huntAll must be of type Player here.');
-    //         }
+        for (const player of hunted) {
+            if (!(player instanceof Player)) {
+                throw new Error('[Npc] huntAll must be of type Player here.');
+            }
 
-    //         if (hunt.checkNotBusy && player.busy()) {
-    //             continue;
-    //         }
+            if (hunt.checkNotBusy && player.busy()) {
+                continue;
+            }
 
-    //         if (hunt.checkAfk && player.zonesAfk()) {
-    //             continue;
-    //         }
+            if (hunt.checkAfk && player.zonesAfk()) {
+                continue;
+            }
 
-    //         if (hunt.checkNotTooStrong === HuntCheckNotTooStrong.OUTSIDE_WILDERNESS && !player.isInWilderness() && player.combatLevel > type.vislevel * 2) {
-    //             continue;
-    //         }
-    //         if (this.target !== player && !World.gameMap.isMulti(CoordGrid.packCoord(player.level, player.x, player.z))) {
-    //             if (hunt.checkNotCombat !== -1 && (player.getVar(hunt.checkNotCombat) as number) + 8 > World.currentTick) {
-    //                 continue;
-    //             }
-    //             if (hunt.checkNotCombatSelf !== -1 && (this.getVar(hunt.checkNotCombatSelf) as number) + 8 > World.currentTick) {
-    //                 continue;
-    //             }
-    //         }
-    //         if (
-    //             hunt.checkVars &&
-    //             !hunt.checkVars.every(checkVar => {
-    //                 return checkVar.varId === -1 || hunt.checkHuntCondition(player.getVar(checkVar.varId) as number, checkVar.condition, checkVar.val);
-    //             })
-    //         ) {
-    //             continue;
-    //         }
+            if (hunt.checkNotTooStrong === HuntCheckNotTooStrong.OUTSIDE_WILDERNESS && !player.isInWilderness() && player.combatLevel > type.vislevel * 2) {
+                continue;
+            }
+            if (this.target !== player && !World.gameMap.isMulti(CoordGrid.packCoord(player.level, player.x, player.z))) {
+                if (hunt.checkNotCombat !== -1 && (player.getVar(hunt.checkNotCombat) as number) + 8 > World.currentTick) {
+                    continue;
+                }
+                if (hunt.checkNotCombatSelf !== -1 && (this.getVar(hunt.checkNotCombatSelf) as number) + 8 > World.currentTick) {
+                    continue;
+                }
+            }
+            if (
+                hunt.checkVars &&
+                !hunt.checkVars.every(checkVar => {
+                    return checkVar.varId === -1 || hunt.checkHuntCondition(player.getVar(checkVar.varId) as number, checkVar.condition, checkVar.val);
+                })
+            ) {
+                continue;
+            }
 
-    //         if (hunt.checkInv !== -1) {
-    //             let quantity: number = 0;
-    //             if (hunt.checkObj !== -1) {
-    //                 quantity = player.invTotal(hunt.checkInv, hunt.checkObj);
-    //             } else if (hunt.checkObjParam !== -1) {
-    //                 quantity = player.invTotalParam(hunt.checkInv, hunt.checkObjParam);
-    //             }
-    //             if (!hunt.checkHuntCondition(quantity, hunt.checkInvCondition, hunt.checkInvVal)) {
-    //                 continue;
-    //             }
-    //         }
-    //         players.push(player);
-    //     }
-    //     return players;
-    // }
+            if (hunt.checkInv !== -1) {
+                let quantity: number = 0;
+                if (hunt.checkObj !== -1) {
+                    quantity = player.invTotal(hunt.checkInv, hunt.checkObj);
+                } else if (hunt.checkObjParam !== -1) {
+                    quantity = player.invTotalParam(hunt.checkInv, hunt.checkObjParam);
+                }
+                if (!hunt.checkHuntCondition(quantity, hunt.checkInvCondition, hunt.checkInvVal)) {
+                    continue;
+                }
+            }
+            players.push(player);
+        }
+        return players;
+    }
 
-    // private huntNpcs(hunt: HuntType): Entity[] {
-    //     return Array.from(new HuntIterator(World.currentTick, this.level, this.x, this.z, this.huntrange, hunt.checkVis, hunt.checkNpc, hunt.checkCategory, HuntModeType.NPC));
-    // }
+    private huntNpcs(hunt: HuntType): Entity[] {
+        return Array.from(new HuntIterator(World.currentTick, this.level, this.x, this.z, this.huntrange, hunt.checkVis, hunt.checkNpc, hunt.checkCategory, HuntModeType.NPC));
+    }
 
-    // private huntObjs(hunt: HuntType): Entity[] {
-    //     return Array.from(new HuntIterator(World.currentTick, this.level, this.x, this.z, this.huntrange, hunt.checkVis, hunt.checkObj, hunt.checkCategory, HuntModeType.OBJ));
-    // }
+    private huntObjs(hunt: HuntType): Entity[] {
+        return Array.from(new HuntIterator(World.currentTick, this.level, this.x, this.z, this.huntrange, hunt.checkVis, hunt.checkObj, hunt.checkCategory, HuntModeType.OBJ));
+    }
 
-    // private huntLocs(hunt: HuntType): Entity[] {
-    //     return Array.from(new HuntIterator(World.currentTick, this.level, this.x, this.z, this.huntrange, hunt.checkVis, hunt.checkLoc, hunt.checkCategory, HuntModeType.SCENERY));
-    // }
+    private huntLocs(hunt: HuntType): Entity[] {
+        return Array.from(new HuntIterator(World.currentTick, this.level, this.x, this.z, this.huntrange, hunt.checkVis, hunt.checkLoc, hunt.checkCategory, HuntModeType.SCENERY));
+    }
 
     // --- Other
 

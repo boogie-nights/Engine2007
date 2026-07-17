@@ -36,6 +36,9 @@ import { pack as packVars } from './config/VarsConfig.ts';
 import { pack as packEnum } from './config/EnumConfig.ts';
 import { pack as packParam } from './config/ParamConfig.ts';
 import OpenRs2 from '#/util/OpenRs2.ts';
+import { pack as packHunt} from './config/HuntConfig.ts';
+import { pack as packStruct} from './config/StructConfig.ts';
+import { pack as packCategory } from './config/Category.ts';
 
 export async function packAll(modelFlags: number[]) {
     if (parentPort) {
@@ -65,6 +68,9 @@ export async function packAll(modelFlags: number[]) {
     await packVars();
     await packEnum();
     await packParam();
+    await packHunt();
+    await packStruct();
+    await packCategory();
     
     // revalidatePack();
 

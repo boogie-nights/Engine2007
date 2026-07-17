@@ -4,7 +4,7 @@ import { LocLayer, LocAngle } from '@2004scape/rsmod-pathfinder';
 import { ParamHelper } from '#/cache/config/ParamHelper.js';
 import ParamType from '#/cache/config/ParamType.js';
 // import SpotanimType from '#/cache/config/SpotanimType.js';
-// import StructType from '#/cache/config/StructType.js';
+import StructType from '#/cache/config/StructType.js';
 import { CoordGrid } from '#/engine/CoordGrid.js';
 import { HuntModeType } from '#/engine/entity/hunt/HuntModeType.js';
 import { HuntVis } from '#/engine/entity/hunt/HuntVis.js';
@@ -17,7 +17,7 @@ import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import { ActiveNpc, ActivePlayer } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
 import ScriptState from '#/engine/script/ScriptState.js';
-import { check, CoordValid, HuntVisValid, NumberNotNull, NumberPositive, FindSquareValid, SeqTypeValid, LocTypeValid } from '#/engine/script/ScriptValidator.js';
+import { check, CoordValid, HuntVisValid, NumberNotNull, NumberPositive, FindSquareValid, SeqTypeValid, StructTypeValid, ParamTypeValid, LocTypeValid } from '#/engine/script/ScriptValidator.js';
 import World from '#/engine/World.js';
 import Environment from '#/util/Environment.js';
 
@@ -122,19 +122,19 @@ const ServerOps: CommandHandlers = {
     },
 
     [ScriptOpcode.NPC_HUNTNEXT]: state => {
-        // const result = state.huntIterator?.next();
-        // if (!result || result.done) {
-        //     state.pushInt(0);
-        //     return;
-        // }
+        const result = state.huntIterator?.next();
+        if (!result || result.done) {
+            state.pushInt(0);
+            return;
+        }
 
-        // if (!(result.value instanceof Npc)) {
-        //     throw new Error('[ServerOps] npc_huntnext command must result instance of Npc.');
-        // }
+        if (!(result.value instanceof Npc)) {
+            throw new Error('[ServerOps] npc_huntnext command must result instance of Npc.');
+        }
 
-        // state.activeNpc = result.value;
-        // state.pointerAdd(ActiveNpc[state.intOperand]);
-        // state.pushInt(1);
+        state.activeNpc = result.value;
+        state.pointerAdd(ActiveNpc[state.intOperand]);
+        state.pushInt(1);
     },
 
     [ScriptOpcode.INZONE]: state => {
@@ -252,15 +252,15 @@ const ServerOps: CommandHandlers = {
     },
 
     [ScriptOpcode.STRUCT_PARAM]: state => {
-        // const [structId, paramId] = state.popInts(2);
+        const [structId, paramId] = state.popInts(2);
 
-        // const paramType: ParamType = check(paramId, ParamTypeValid);
-        // const structType: StructType = check(structId, StructTypeValid);
-        // if (paramType.isString()) {
-        //     state.pushString(ParamHelper.getStringParam(paramType.id, structType, paramType.defaultString));
-        // } else {
-        //     state.pushInt(ParamHelper.getIntParam(paramType.id, structType, paramType.defaultInt));
-        // }
+        const paramType: ParamType = check(paramId, ParamTypeValid);
+        const structType: StructType = check(structId, StructTypeValid);
+        if (paramType.isString()) {
+            state.pushString(ParamHelper.getStringParam(paramType.id, structType, paramType.defaultString));
+        } else {
+            state.pushInt(ParamHelper.getIntParam(paramType.id, structType, paramType.defaultInt));
+        }
     },
 
     [ScriptOpcode.COORDX]: state => {

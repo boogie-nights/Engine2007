@@ -1,12 +1,12 @@
 import { LocAngle, LocShape } from '@2004scape/rsmod-pathfinder';
 
-// import CategoryType from '#/cache/config/CategoryType.js';
+import CategoryType from '#/cache/config/CategoryType.js';
 import { ConfigType } from '#/cache/config/ConfigType.js';
 // import DbRowType from '#/cache/config/DbRowType.js';
 // import DbTableType from '#/cache/config/DbTableType.js';
 import EnumType from '#/cache/config/EnumType.js';
 // import FontType from '#/cache/config/FontType.js';
-// import HuntType from '#/cache/config/HuntType.js';
+import HuntType from '#/cache/config/HuntType.js';
 // import IdkType from '#/cache/config/IdkType.js';
 import InvType from '#/cache/config/InvType.js';
 import LocType from '#/cache/config/LocType.js';
@@ -16,7 +16,7 @@ import ObjType from '#/cache/config/ObjType.js';
 import ParamType from '#/cache/config/ParamType.js';
 import SeqType from '#/cache/config/SeqType.js';
 // import SpotanimType from '#/cache/config/SpotanimType.js';
-// import StructType from '#/cache/config/StructType.js';
+import StructType from '#/cache/config/StructType.js';
 import VarNpcType from '#/cache/config/VarNpcType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.js';
 import VarSharedType from '#/cache/config/VarSharedType.js';
@@ -113,7 +113,7 @@ export const NpcTypeValid: ScriptValidator<number, NpcType> = new ScriptInputCon
 export const NpcStatValid: ScriptValidator<number, NpcStat> = new ScriptInputRangeValidator(NpcStat.ATTACK, NpcStat.MAGIC, 'NpcStat');
 export const PlayerStatValid: ScriptValidator<number, PlayerStat> = new ScriptInputRangeValidator(PlayerStat.ATTACK, PlayerStat.RUNECRAFT, 'PlayerStat');
 export const QueueValid: ScriptValidator<number, number> = new ScriptInputRangeValidator(0, 19, 'AIQueue');
-// export const HuntTypeValid: ScriptValidator<number, HuntType> = new ScriptInputConfigTypeValidator(HuntType.get, (input: number) => input >= 0 && input < HuntType.count, 'Hunt');
+export const HuntTypeValid: ScriptValidator<number, HuntType> = new ScriptInputConfigTypeValidator(HuntType.get, (input: number) => input >= 0 && input < HuntType.count, 'Hunt');
 export const NpcModeValid: ScriptValidator<number, NpcMode> = new ScriptInputRangeValidator(NpcMode.NULL, NpcMode.APNPC5, 'NpcMode');
 export const HitTypeValid: ScriptValidator<number, HitType> = new ScriptInputRangeValidator(HitType.BLOCK, HitType.POISON, 'Hit');
 // export const SpotAnimTypeValid: ScriptValidator<number, SpotanimType> = new ScriptInputConfigTypeValidator(SpotanimType.get, (input: number) => input >= 0 && input < SpotanimType.count, 'Spotanim');
@@ -121,7 +121,7 @@ export const EnumTypeValid: ScriptValidator<number, EnumType> = new ScriptInputC
 export const ObjTypeValid: ScriptValidator<number, ObjType> = new ScriptInputConfigTypeValidator(ObjType.get, (input: number) => input >= 0 && input < ObjType.count, 'Obj');
 export const ObjStackValid: ScriptValidator<number, number> = new ScriptInputRangeValidator(1, Inventory.STACK_LIMIT, 'ObjStack');
 export const InvTypeValid: ScriptValidator<number, InvType> = new ScriptInputConfigTypeValidator(InvType.get, (input: number) => input >= 0 && input < InvType.count, 'Inv');
-// export const CategoryTypeValid: ScriptValidator<number, CategoryType> = new ScriptInputConfigTypeValidator(CategoryType.get, (input: number) => input >= 0 && input < CategoryType.count, 'Cat');
+export const CategoryTypeValid: ScriptValidator<number, CategoryType> = new ScriptInputConfigTypeValidator(CategoryType.get, (input: number) => input >= 0 && input < CategoryType.count, 'Cat');
 // export const IDKTypeValid: ScriptValidator<number, IdkType> = new ScriptInputConfigTypeValidator(IdkType.get, (input: number) => input >= 0 && input < IdkType.count, 'Idk');
 export const HuntVisValid: ScriptValidator<number, HuntVis> = new ScriptInputRangeValidator(HuntVis.OFF, HuntVis.LINEOFWALK, 'HuntVis');
 export const FindSquareValid: ScriptValidator<number, MapFindSquareType> = new ScriptInputRangeValidator(MapFindSquareType.LINEOFWALK, MapFindSquareType.NONE, 'FindSquare');
@@ -132,7 +132,7 @@ export const VarNpcValid: ScriptValidator<number, VarNpcType> = new ScriptInputC
 export const VarSharedValid: ScriptValidator<number, VarSharedType> = new ScriptInputConfigTypeValidator(VarSharedType.get, (input: number) => input >= 0 && input < VarSharedType.count, 'Vars');
 // export const FontTypeValid: ScriptValidator<number, FontType> = new ScriptInputConfigTypeValidator(FontType.get, (input: number) => input >= 0 && input < FontType.count, 'Font');
 // export const MesanimValid: ScriptValidator<number, MesanimType> = new ScriptInputConfigTypeValidator(MesanimType.get, (input: number) => input >= 0 && input < MesanimType.count, 'Mesanim');
-// export const StructTypeValid: ScriptValidator<number, StructType> = new ScriptInputConfigTypeValidator(StructType.get, (input: number) => input >= 0 && input < StructType.count, 'Struct');
+export const StructTypeValid: ScriptValidator<number, StructType> = new ScriptInputConfigTypeValidator(StructType.get, (input: number) => input >= 0 && input < StructType.count, 'Struct');
 // export const DbRowTypeValid: ScriptValidator<number, DbRowType> = new ScriptInputConfigTypeValidator(DbRowType.get, (input: number) => input >= 0 && input < DbRowType.count, 'Dbrow');
 // export const DbTableTypeValid: ScriptValidator<number, DbTableType> = new ScriptInputConfigTypeValidator(DbTableType.get, (input: number) => input >= 0 && input < DbTableType.count, 'Dbtable');
 export const GenderValid: ScriptValidator<number, number> = new ScriptInputRangeValidator(0, 1, 'Gender');

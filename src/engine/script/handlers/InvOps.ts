@@ -1,4 +1,4 @@
-// import CategoryType from '#/cache/config/CategoryType.js';
+import CategoryType from '#/cache/config/CategoryType.js';
 import InvType from '#/cache/config/InvType.js';
 import ObjType from '#/cache/config/ObjType.js';
 import { CoordGrid } from '#/engine/CoordGrid.js';
@@ -12,7 +12,7 @@ import { Inventory } from '#/engine/Inventory.js';
 import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import { ActiveObj, ActivePlayer, checkedHandler, ProtectedActivePlayer } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
-import { check, CoordValid, DurationValid, InvTypeValid, NumberNotNull, ObjStackValid, ObjTypeValid } from '#/engine/script/ScriptValidator.js';
+import { check, CategoryTypeValid, CoordValid, DurationValid, InvTypeValid, NumberNotNull, ObjStackValid, ObjTypeValid } from '#/engine/script/ScriptValidator.js';
 import World from '#/engine/World.js';
 import { WealthEventType } from '#/server/logger/WealthEventType.ts';
 
@@ -636,12 +636,12 @@ const InvOps: CommandHandlers = {
 
     // inv read
     [ScriptOpcode.INV_TOTALCAT]: checkedHandler(ActivePlayer, state => {
-        // const [inv, category] = state.popInts(2);
+        const [inv, category] = state.popInts(2);
 
-        // const invType: InvType = check(inv, InvTypeValid);
-        // const catType: CategoryType = check(category, CategoryTypeValid);
+        const invType: InvType = check(inv, InvTypeValid);
+        const catType: CategoryType = check(category, CategoryTypeValid);
 
-        // state.pushInt(state.activePlayer.invTotalCat(invType.id, catType.id));
+        state.pushInt(state.activePlayer.invTotalCat(invType.id, catType.id));
     }),
 
     // inv protocol
@@ -801,5 +801,3 @@ const InvOps: CommandHandlers = {
 };
 
 export default InvOps;
-
-// todo
