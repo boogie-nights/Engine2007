@@ -1,9 +1,9 @@
 import NpcType from '#/cache/config/NpcType.js';
 import { ParamHelper } from '#/cache/config/ParamHelper.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import ParamType from '#/cache/config/ParamType.js';
 import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
-import { check, NpcTypeValid, NumberNotNull } from '#/engine/script/ScriptValidator.js';
+import { check, NpcTypeValid, NumberNotNull, ParamTypeValid } from '#/engine/script/ScriptValidator.js';
 
 const NpcConfigOps: CommandHandlers = {
     [ScriptOpcode.NC_NAME]: state => {
@@ -13,15 +13,15 @@ const NpcConfigOps: CommandHandlers = {
     },
 
     [ScriptOpcode.NC_PARAM]: state => {
-        // const [npcId, paramId] = state.popInts(2);
+        const [npcId, paramId] = state.popInts(2);
 
-        // const npcType: NpcType = check(npcId, NpcTypeValid);
-        // const paramType: ParamType = check(paramId, ParamTypeValid);
-        // if (paramType.isString()) {
-        //     state.pushString(ParamHelper.getStringParam(paramId, npcType, paramType.defaultString));
-        // } else {
-        //     state.pushInt(ParamHelper.getIntParam(paramId, npcType, paramType.defaultInt));
-        // }
+        const npcType: NpcType = check(npcId, NpcTypeValid);
+        const paramType: ParamType = check(paramId, ParamTypeValid);
+        if (paramType.isString()) {
+            state.pushString(ParamHelper.getStringParam(paramId, npcType, paramType.defaultString));
+        } else {
+            state.pushInt(ParamHelper.getIntParam(paramId, npcType, paramType.defaultInt));
+        }
     },
 
     [ScriptOpcode.NC_CATEGORY]: state => {

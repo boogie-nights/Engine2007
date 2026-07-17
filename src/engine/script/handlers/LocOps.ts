@@ -2,7 +2,7 @@ import { LocAngle, LocShape, locShapeLayer } from '@2004scape/rsmod-pathfinder';
 
 import LocType from '#/cache/config/LocType.js';
 import { ParamHelper } from '#/cache/config/ParamHelper.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import ParamType from '#/cache/config/ParamType.js';
 import SeqType from '#/cache/config/SeqType.js';
 import { CoordGrid } from '#/engine/CoordGrid.js';
 import { EntityLifeCycle } from '#/engine/entity/EntityLifeCycle.js';
@@ -11,7 +11,7 @@ import { LocIterator } from '#/engine/script/ScriptIterators.js';
 import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import { ActiveLoc, checkedHandler } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
-import { check, CoordValid, DurationValid, LocAngleValid, LocShapeValid, LocTypeValid, SeqTypeValid } from '#/engine/script/ScriptValidator.js';
+import { check, CoordValid, DurationValid, LocAngleValid, LocShapeValid, LocTypeValid, SeqTypeValid, ParamTypeValid } from '#/engine/script/ScriptValidator.js';
 import World from '#/engine/World.js';
 
 const LocOps: CommandHandlers = {
@@ -112,14 +112,14 @@ const LocOps: CommandHandlers = {
     },
 
     [ScriptOpcode.LOC_PARAM]: checkedHandler(ActiveLoc, state => {
-        // const paramType: ParamType = check(state.popInt(), ParamTypeValid);
+        const paramType: ParamType = check(state.popInt(), ParamTypeValid);
 
-        // const locType: LocType = check(state.activeLoc.type, LocTypeValid);
-        // if (paramType.isString()) {
-        //     state.pushString(ParamHelper.getStringParam(paramType.id, locType, paramType.defaultString));
-        // } else {
-        //     state.pushInt(ParamHelper.getIntParam(paramType.id, locType, paramType.defaultInt));
-        // }
+        const locType: LocType = check(state.activeLoc.type, LocTypeValid);
+        if (paramType.isString()) {
+            state.pushString(ParamHelper.getStringParam(paramType.id, locType, paramType.defaultString));
+        } else {
+            state.pushInt(ParamHelper.getIntParam(paramType.id, locType, paramType.defaultInt));
+        }
     }),
 
     [ScriptOpcode.LOC_TYPE]: checkedHandler(ActiveLoc, state => {

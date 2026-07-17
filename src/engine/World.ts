@@ -12,7 +12,7 @@ import kleur from 'kleur';
 import Component from '#/cache/config/Component.js';
 // import DbRowType from '#/cache/config/DbRowType.js';
 // import DbTableType from '#/cache/config/DbTableType.js';
-// import EnumType from '#/cache/config/EnumType.js';
+import EnumType from '#/cache/config/EnumType.js';
 // import FontType from '#/cache/config/FontType.js';
 // import HuntType from '#/cache/config/HuntType.js';
 // import IdkType from '#/cache/config/IdkType.js';
@@ -21,14 +21,14 @@ import LocType from '#/cache/config/LocType.js';
 // import MesanimType from '#/cache/config/MesanimType.js';
 import NpcType from '#/cache/config/NpcType.js';
 import ObjType from '#/cache/config/ObjType.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import ParamType from '#/cache/config/ParamType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import SeqType from '#/cache/config/SeqType.js';
 // import SpotanimType from '#/cache/config/SpotanimType.js';
 // import StructType from '#/cache/config/StructType.js';
-// import VarNpcType from '#/cache/config/VarNpcType.js';
+import VarNpcType from '#/cache/config/VarNpcType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.js';
-// import VarSharedType from '#/cache/config/VarSharedType.js';
+import VarSharedType from '#/cache/config/VarSharedType.js';
 // import WordEnc from '#/cache/wordenc/WordEnc.js';
 import { BlockWalk } from '#/engine/entity/BlockWalk.js';
 import { EntityLifeCycle } from '#/engine/entity/EntityLifeCycle.js';
@@ -231,19 +231,10 @@ class World {
     }
 
     reload(clearInvs: boolean = true): void {
-        // VarPlayerType.load('data/pack');
-        // VarBitType.load('data/pack');
-        // ParamType.load('data/pack');
-        // ObjType.load('data/pack');
-        // LocType.load('data/pack');
-        // NpcType.load('data/pack');
         // IdkType.load('data/pack');
-        // SeqType.load('data/pack');
         // SpotanimType.load('data/pack');
         // CategoryType.load('data/pack');
-        // EnumType.load('data/pack');
         // StructType.load('data/pack');
-        // InvType.load('data/pack');
 
         if (clearInvs) {
             this.invs.clear();
@@ -270,32 +261,30 @@ class World {
         // DbRowType.load('data/pack');
         // DbTableIndex.init();
         // HuntType.load('data/pack');
-        // VarNpcType.load('data/pack');
-        // VarSharedType.load('data/pack');
 
-        // if (this.vars.length !== VarSharedType.count) {
-        //     const old = this.vars;
-        //     this.vars = new Int32Array(VarSharedType.count);
-        //     for (let i = 0; i < VarSharedType.count && i < old.length; i++) {
-        //         this.vars[i] = old[i];
-        //     }
+        if (this.vars.length !== VarSharedType.count) {
+            const old = this.vars;
+            this.vars = new Int32Array(VarSharedType.count);
+            for (let i = 0; i < VarSharedType.count && i < old.length; i++) {
+                this.vars[i] = old[i];
+            }
 
-        //     const oldString = this.varsString;
-        //     this.varsString = new Array(VarSharedType.count);
-        //     for (let i = 0; i < VarSharedType.count && i < old.length; i++) {
-        //         this.varsString[i] = oldString[i];
-        //     }
+            const oldString = this.varsString;
+            this.varsString = new Array(VarSharedType.count);
+            for (let i = 0; i < VarSharedType.count && i < old.length; i++) {
+                this.varsString[i] = oldString[i];
+            }
 
-        //     for (let i = 0; i < this.vars.length; i++) {
-        //         const varsh = VarSharedType.get(i);
-        //         if (varsh.type === ScriptVarType.STRING) {
-        //             // todo: "null"? another value?
-        //             continue;
-        //         } else {
-        //             this.vars[i] = varsh.type === ScriptVarType.INT ? 0 : -1;
-        //         }
-        //     }
-        // }
+            for (let i = 0; i < this.vars.length; i++) {
+                const varsh = VarSharedType.get(i);
+                if (varsh.type === ScriptVarType.STRING) {
+                    // todo: "null"? another value?
+                    continue;
+                } else {
+                    this.vars[i] = varsh.type === ScriptVarType.INT ? 0 : -1;
+                }
+            }
+        }
 
         // Component.load('data/pack');
 
@@ -317,9 +306,6 @@ class World {
 
     async start(skipMaps = false, startCycle = true): Promise<void> {
         printInfo('Starting world');
-        await OpenRs2.RS2_500.predownload();
-        await OpenRs2.RS2_500.loadKeys();
-        await OpenRs2.RS2_500.loadMapIndex();
 
         const huffmanBytes = await OpenRs2.RS2_500.getFile(10, 'huffman', '');
         if (!huffmanBytes) {
@@ -332,14 +318,29 @@ class World {
             ObjType.load(objIndex);
         }
 
-        const configIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [5]);
-        if (configIndex) {
-            InvType.load(configIndex);
+        const invIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [5]);
+        if (invIndex) {
+            InvType.load(invIndex);
         }
 
-        const VarpIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [16]);
-        if (VarpIndex) {
-            VarPlayerType.load(VarpIndex);
+        const varnIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 6: 'varn.pack' });
+        if (varnIndex.isGroupValid(6)) {
+            VarNpcType.load(varnIndex);
+        }
+
+        const varsIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 7: 'vars.pack' });
+        if (varsIndex.isGroupValid(7)) {
+            VarSharedType.load(varsIndex);
+        }
+
+        const paramIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [11]);
+        if (paramIndex) {
+            ParamType.load(paramIndex);
+        }
+
+        const varpIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [16]);
+        if (varpIndex) {
+            VarPlayerType.load(varpIndex);
         }
 
         const VarbIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(22);
@@ -360,6 +361,11 @@ class World {
         const LocIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(16);
         if (LocIndex) {
             LocType.load(LocIndex);
+        }
+
+        const EnumIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(17);
+        if (EnumIndex) {
+           EnumType.load(EnumIndex);
         }
 
         const NpcIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(18);

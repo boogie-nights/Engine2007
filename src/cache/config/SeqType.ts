@@ -111,7 +111,7 @@ export default class SeqType extends ConfigType {
     maxloops: number = 99;
     preanim_move: number = 0;
     postanim_move: number = 0;
-    duplicatebehavior: number = 0;
+    duplicatebehaviour: number = 0;
     field1993: boolean = false;
 
     // precalculated for seqlength
@@ -163,7 +163,7 @@ export default class SeqType extends ConfigType {
         } else if (code === 10) {
             this.postanim_move = dat.g1();
         } else if (code === 11) {
-            this.duplicatebehavior = dat.g1();
+            this.duplicatebehaviour = dat.g1();
         } else if (code === 12) {
             const count = dat.g1();
             this.iframes = new Int32Array(count);

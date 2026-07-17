@@ -88,10 +88,10 @@ function encodeFlo(
 export function pack() {
     const floNameToId     = loadNameToIdMap('flo.pack');
     const textureNameToId = loadNameToIdMap('texture.pack');
-    const configBlocks    = readConfigFile('all.flo');
+    const configBlocks    = readConfigFile('.flo');
 
     if (configBlocks.size === 0) {
-        console.error(`No entries found in ${path.join(CONFIG_DIR, 'all.flo')}`);
+        console.error('No .flo entries found');
         return;
     }
 

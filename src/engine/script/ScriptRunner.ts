@@ -7,7 +7,7 @@ import type { ScriptArgument } from '#/engine/entity/PlayerQueueRequest.js';
 import CoreOps from '#/engine/script/handlers/CoreOps.js';
 // import DbOps from '#/engine/script/handlers/DbOps.js';
 import DebugOps from '#/engine/script/handlers/DebugOps.js';
-// import EnumOps from '#/engine/script/handlers/EnumOps.js';
+import EnumOps from '#/engine/script/handlers/EnumOps.ts';
 import InvOps from '#/engine/script/handlers/InvOps.js';
 import LocConfigOps from '#/engine/script/handlers/LocConfigOps.js';
 import LocOps from '#/engine/script/handlers/LocOps.js';
@@ -46,7 +46,7 @@ export default class ScriptRunner {
         ...LocConfigOps,
         ...ObjConfigOps,
         ...InvOps,
-        // ...EnumOps,
+        ...EnumOps,
         ...StringOps,
         ...NumberOps,
         // ...DbOps, todo

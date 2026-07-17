@@ -22,8 +22,8 @@ export const enum PlayerStat {
     SLAYER,
     FARMING,
     RUNECRAFT,
-    CONSTRUCTION,
     HUNTER,
+    CONSTRUCTION,
     SUMMONING
 }
 

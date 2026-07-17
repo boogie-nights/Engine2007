@@ -1,9 +1,9 @@
 import LocType from '#/cache/config/LocType.js';
 import { ParamHelper } from '#/cache/config/ParamHelper.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import ParamType from '#/cache/config/ParamType.js';
 import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
-import { check, LocTypeValid } from '#/engine/script/ScriptValidator.js';
+import { check, LocTypeValid, ParamTypeValid } from '#/engine/script/ScriptValidator.js';
 
 const LocConfigOps: CommandHandlers = {
     [ScriptOpcode.LC_NAME]: state => {
@@ -13,15 +13,15 @@ const LocConfigOps: CommandHandlers = {
     },
 
     [ScriptOpcode.LC_PARAM]: state => {
-        // const [locId, paramId] = state.popInts(2);
+        const [locId, paramId] = state.popInts(2);
 
-        // const locType: LocType = check(locId, LocTypeValid);
-        // const paramType: ParamType = check(paramId, ParamTypeValid);
-        // if (paramType.isString()) {
-        //     state.pushString(ParamHelper.getStringParam(paramType.id, locType, paramType.defaultString));
-        // } else {
-        //     state.pushInt(ParamHelper.getIntParam(paramType.id, locType, paramType.defaultInt));
-        // }
+        const locType: LocType = check(locId, LocTypeValid);
+        const paramType: ParamType = check(paramId, ParamTypeValid);
+        if (paramType.isString()) {
+            state.pushString(ParamHelper.getStringParam(paramType.id, locType, paramType.defaultString));
+        } else {
+            state.pushInt(ParamHelper.getIntParam(paramType.id, locType, paramType.defaultInt));
+        }
     },
 
     [ScriptOpcode.LC_CATEGORY]: state => {

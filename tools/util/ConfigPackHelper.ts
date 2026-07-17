@@ -4,6 +4,7 @@ import { deflateRaw } from 'pako';
 import Packet from '#/io/Packet.ts';
 import { ungzip } from 'pako';
 import BZip2 from '#/io/BZip2.ts';
+import Environment from '#/util/Environment.js';
 
 export const CACHE_DIR = './data/cache';
 export const PACK_DIR = '../content/pack';
@@ -293,30 +294,105 @@ export function loadNameToIdMap(packFileName: string): Map<string, number> {
     return result;
 }
 
-export function readConfigFile(configFileName: string): Map<string, string[]> {
-    const blocks = new Map<string, string[]>();
-    const filePath = path.join(CONFIG_DIR, configFileName);
+// Mirrors PackShared.ts's readDirTree/findFiles: walk once into a flat Set of
+// every file path, then filter that set by extension. Splitting it this way
+// means readConfigFile can be called for several different extensions in the
+// same run without re-walking CONFIG_DIR each time (see getConfigDirTree).
+export function readDirTree(dirTree: Set<string>, dirPath: string): void {
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
-    if (!fs.existsSync(filePath)) return blocks;
+    for (const entry of entries) {
+        const target = `${entry.parentPath}/${entry.name}`;
 
-    const lines = fs.readFileSync(filePath, 'utf-8').split(/\r?\n/);
-    let currentName: string | null = null;
-    let currentLines: string[] = [];
-
-    for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-
-        const headerMatch = trimmed.match(/^\[(.+)]$/);
-        if (headerMatch) {
-            if (currentName !== null) blocks.set(currentName, currentLines);
-            currentName = headerMatch[1];
-            currentLines = [];
-        } else if (currentName !== null) {
-            currentLines.push(trimmed);
+        if (entry.isDirectory()) {
+            readDirTree(dirTree, target);
+        } else {
+            dirTree.add(target);
         }
     }
-    if (currentName !== null) blocks.set(currentName, currentLines);
+}
+
+export function findFiles(dirTree: Set<string>, extension: string): Set<string> {
+    const results = new Set<string>();
+
+    for (const entry of dirTree) {
+        if (entry.endsWith(extension)) {
+            results.add(entry);
+        }
+    }
+
+    return results;
+}
+
+let cachedConfigDirTree: Set<string> | null = null;
+
+function getConfigDirTree(): Set<string> {
+    if (!cachedConfigDirTree) {
+        const scriptsDir = `${Environment.BUILD_SRC_DIR}/scripts`;
+        cachedConfigDirTree = new Set<string>();
+        if (fs.existsSync(scriptsDir)) {
+            readDirTree(cachedConfigDirTree, scriptsDir);
+        }
+    }
+    return cachedConfigDirTree;
+}
+
+// For packers that need raw file paths rather than merged [name] blocks —
+// e.g. ones with their own multi-line-aware parser (obj, inv) instead of
+// using readConfigFile directly. Shares the same cached tree as
+// readConfigFile, so mixing calls to both in one run still only walks
+// BUILD_SRC_DIR/scripts once.
+export function findConfigFiles(extension: string): Set<string> {
+    return findFiles(getConfigDirTree(), extension);
+}
+
+// Scans BUILD_SRC_DIR/scripts for every file ending in `extension` and
+// merges all their [name] blocks into one map.
+export function readConfigFile(extension: string): Map<string, string[]> {
+    const blocks = new Map<string, string[]>();
+    const files = findFiles(getConfigDirTree(), extension);
+
+    for (const file of files) {
+        const rawLines = fs.readFileSync(file, 'utf-8').split('\n');
+
+        let currentName: string | null = null;
+        let currentLines: string[] = [];
+
+        for (const raw of rawLines) {
+            // Only strip a trailing \r (CRLF files) — never trim the value
+            // side of key=value, since some values (e.g. enum string data)
+            // can carry meaningful leading/trailing whitespace that the
+            // unpacker wrote verbatim from buf.gjstr().
+            const line = raw.endsWith('\r') ? raw.slice(0, -1) : raw;
+            const trimmed = line.trim();
+
+            if (trimmed.length === 0 || trimmed.startsWith('//')) continue;
+
+            const headerMatch = trimmed.match(/^\[(.+)]$/);
+            if (headerMatch) {
+                if (currentName !== null) {
+                    if (blocks.has(currentName)) {
+                        throw new Error(`Duplicate config found: ${currentName} (in ${file})`);
+                    }
+                    blocks.set(currentName, currentLines);
+                }
+                currentName = headerMatch[1];
+                currentLines = [];
+                continue;
+            }
+
+            if (currentName !== null) {
+                currentLines.push(line);
+            }
+        }
+
+        if (currentName !== null) {
+            if (blocks.has(currentName)) {
+                throw new Error(`Duplicate config found: ${currentName} (in ${file})`);
+            }
+            blocks.set(currentName, currentLines);
+        }
+    }
 
     return blocks;
 }

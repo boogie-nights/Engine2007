@@ -213,11 +213,11 @@ export function pack() {
     const animNameToId = loadNameToIdMap('anim.pack');
     const seqNameToId = loadNameToIdMap('seq.pack');
     const seqLocations = loadSeqLocations();
-    const configBlocks = readConfigFile('all.seq');
     const objNameToId = loadNameToIdMap('obj.pack');
+    const configBlocks    = readConfigFile('.seq');
 
     if (configBlocks.size === 0) {
-        console.error(`No entries found in ${path.join(CONFIG_DIR, 'all.seq')}`);
+        console.error('No .seq entries found');
         return;
     }
 

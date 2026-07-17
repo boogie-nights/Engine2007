@@ -96,12 +96,12 @@ function encodeVarbit(
 
 export function pack() {
     const varpNameToId = loadNameToIdMap('varp.pack');
-    const varbitNameToId = loadNameToIdMap('varbit.pack'); // name -> sequential id
-    const varbitLocations = loadVarbitLocations();          // sequential id -> {groupId, fileId}
-    const configBlocks = readConfigFile('all.varbit');
+    const varbitNameToId = loadNameToIdMap('varbit.pack');
+    const varbitLocations = loadVarbitLocations();
+    const configBlocks    = readConfigFile('.varbit');
 
     if (configBlocks.size === 0) {
-        console.error(`No entries found in ${path.join(CONFIG_DIR, 'all.varbit')}`);
+        console.error('No .varbit entries found');
         return;
     }
 

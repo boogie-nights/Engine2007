@@ -6,7 +6,7 @@ import { CollisionFlag, CollisionType } from '@2004scape/rsmod-pathfinder';
 import NpcType from '#/cache/config/NpcType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import SeqType from '#/cache/config/SeqType.js';
-// import VarNpcType from '#/cache/config/VarNpcType.js';
+import VarNpcType from '#/cache/config/VarNpcType.js';
 import { Direction, CoordGrid } from '#/engine/CoordGrid.js';
 import { BlockWalk } from '#/engine/entity/BlockWalk.js';
 import Entity from '#/engine/entity/Entity.js';
@@ -52,8 +52,8 @@ export default class Npc extends PathingEntity {
     baseLevels: Uint8Array = new Uint8Array(6);
 
     // runtime variables
-    // readonly vars: Int32Array;
-    // readonly varsString: (string | undefined)[];
+    readonly vars: Int32Array;
+    readonly varsString: (string | undefined)[];
 
     // script variables
     activeScript: ScriptState | null = null;
@@ -96,8 +96,8 @@ export default class Npc extends PathingEntity {
 
         this.setTimer(npcType.timer);
 
-        // this.vars = new Int32Array(VarNpcType.count);
-        // this.varsString = new Array(VarNpcType.count);
+        this.vars = new Int32Array(VarNpcType.count);
+        this.varsString = new Array(VarNpcType.count);
         this.targetOp = npcType.defaultmode;
         this.huntMode = npcType.huntmode;
         this.huntrange = npcType.huntrange;
@@ -194,18 +194,18 @@ export default class Npc extends PathingEntity {
     }
 
     getVar(id: number) {
-        // const varn = VarNpcType.get(id);
-        // return varn.type === ScriptVarType.STRING ? this.varsString[varn.id] : this.vars[varn.id];
+        const varn = VarNpcType.get(id);
+        return varn.type === ScriptVarType.STRING ? this.varsString[varn.id] : this.vars[varn.id];
     }
 
     setVar(id: number, value: number | string) {
-        // const varn = VarNpcType.get(id);
+        const varn = VarNpcType.get(id);
 
-        // if (varn.type === ScriptVarType.STRING && typeof value === 'string') {
-        //     this.varsString[varn.id] = value;
-        // } else if (typeof value === 'number') {
-        //     this.vars[varn.id] = value;
-        // }
+        if (varn.type === ScriptVarType.STRING && typeof value === 'string') {
+            this.varsString[varn.id] = value;
+        } else if (typeof value === 'number') {
+            this.vars[varn.id] = value;
+        }
     }
 
     setTimer(interval: number) {
@@ -294,17 +294,17 @@ export default class Npc extends PathingEntity {
             this.queue.clear();
             this.clearWaypoints();
 
-            // for (let i = 0; i < this.vars.length; i++) {
-            //     const varn = VarNpcType.get(i);
-            //     if (varn.type === ScriptVarType.STRING) {
-            //         // todo: "null"? another value?
-            //         continue;
-            //     } else {
-            //         this.vars[i] = varn.type === ScriptVarType.INT ? 0 : -1;
-            //     }
-            // }
+            for (let i = 0; i < this.vars.length; i++) {
+                const varn = VarNpcType.get(i);
+                if (varn.type === ScriptVarType.STRING) {
+                    // todo: "null"? another value?
+                    continue;
+                } else {
+                    this.vars[i] = varn.type === ScriptVarType.INT ? 0 : -1;
+                }
+            }
 
-            // this.varsString.fill(undefined);
+            this.varsString.fill(undefined);
             this.resetDefaults();
 
             const npcType: NpcType = NpcType.get(this.type);

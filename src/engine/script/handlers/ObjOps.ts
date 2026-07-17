@@ -1,7 +1,7 @@
 import InvType from '#/cache/config/InvType.js';
 import ObjType from '#/cache/config/ObjType.js';
-// import { ParamHelper } from '#/cache/config/ParamHelper.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import { ParamHelper } from '#/cache/config/ParamHelper.js';
+import ParamType from '#/cache/config/ParamType.js';
 import { CoordGrid } from '#/engine/CoordGrid.js';
 import { EntityLifeCycle } from '#/engine/entity/EntityLifeCycle.js';
 import Obj from '#/engine/entity/Obj.js';
@@ -9,7 +9,7 @@ import { ObjIterator } from '#/engine/script/ScriptIterators.js';
 import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import { ActiveObj, ActivePlayer } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
-import { check, CoordValid, DurationValid, InvTypeValid, ObjStackValid, ObjTypeValid } from '#/engine/script/ScriptValidator.js';
+import { check, CoordValid, DurationValid, InvTypeValid, ObjStackValid, ObjTypeValid, ParamTypeValid } from '#/engine/script/ScriptValidator.js';
 import World from '#/engine/World.js';
 import { WealthEventType } from '#/server/logger/WealthEventType.js';
 import Environment from '#/util/Environment.js';
@@ -93,14 +93,14 @@ const ObjOps: CommandHandlers = {
     },
 
     [ScriptOpcode.OBJ_PARAM]: state => {
-        // const paramType: ParamType = check(state.popInt(), ParamTypeValid);
+        const paramType: ParamType = check(state.popInt(), ParamTypeValid);
 
-        // const objType: ObjType = check(state.activeObj.type, ObjTypeValid);
-        // if (paramType.isString()) {
-        //     state.pushString(ParamHelper.getStringParam(paramType.id, objType, paramType.defaultString));
-        // } else {
-        //     state.pushInt(ParamHelper.getIntParam(paramType.id, objType, paramType.defaultInt));
-        // }
+        const objType: ObjType = check(state.activeObj.type, ObjTypeValid);
+        if (paramType.isString()) {
+            state.pushString(ParamHelper.getStringParam(paramType.id, objType, paramType.defaultString));
+        } else {
+            state.pushInt(ParamHelper.getIntParam(paramType.id, objType, paramType.defaultInt));
+        }
     },
 
     [ScriptOpcode.OBJ_NAME]: state => {

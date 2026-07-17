@@ -160,8 +160,8 @@ function unpack() {
                             scalarLines.push(`${nextKey('postanim_move')}=${postanim_move}`);
                         } else if (opcode === 11) {
                             const val = buf.g1();
-                            const duplicatebehavior = val === 0 ? '0' : val === 1 ? 'reset' : val === 2 ? 'reset_loop' : val.toString();
-                            scalarLines.push(`${nextKey('duplicatebehavior')}=${duplicatebehavior}`);
+                            const duplicatebehaviour = val === 0 ? '0' : val === 1 ? 'reset' : val === 2 ? 'reset_loop' : val.toString();
+                            scalarLines.push(`${nextKey('duplicatebehaviour')}=${duplicatebehaviour}`);
                         } else if (opcode === 12) {
                             const count = buf.g1();
                             iframeCount = count;

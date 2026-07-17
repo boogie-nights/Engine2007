@@ -1,7 +1,7 @@
 import ScriptVarType from '#/cache/config/ScriptVarType.ts';
-//import VarNpcType from '#/cache/config/VarNpcType.js';
+import VarNpcType from '#/cache/config/VarNpcType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.ts';
-//import VarSharedType from '#/cache/config/VarSharedType.js';
+import VarSharedType from '#/cache/config/VarSharedType.js';
 import Npc from '#/engine/entity/Npc.js';
 import Player from '#/engine/entity/Player.js';
 import ScriptFile from '#/engine/script/ScriptFile.js';
@@ -10,7 +10,7 @@ import { ProtectedActivePlayer } from '#/engine/script/ScriptPointer.js';
 import ScriptProvider from '#/engine/script/ScriptProvider.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
 import ScriptState from '#/engine/script/ScriptState.js';
-import { check, VarBitValid, VarPlayerValid } from '#/engine/script/ScriptValidator.ts';
+import { check, VarBitValid, VarNpcValid, VarPlayerValid, VarSharedValid } from '#/engine/script/ScriptValidator.ts';
 import World from '#/engine/World.js';
 
 const CoreOps: CommandHandlers = {
@@ -90,35 +90,35 @@ const CoreOps: CommandHandlers = {
     },
 
     [ScriptOpcode.PUSH_VARN]: state => {
-        // const secondary: number = (state.intOperand >> 16) & 0x1;
-        // const npc: Npc | null = secondary ? state._activeNpc2 : state._activeNpc;
+        const secondary: number = (state.intOperand >> 16) & 0x1;
+        const npc: Npc | null = secondary ? state._activeNpc2 : state._activeNpc;
 
-        // if (!npc) {
-        //     throw new Error(`No ${secondary ? 'secondary' : 'primary'} active_npc.`);
-        // }
+        if (!npc) {
+            throw new Error(`No ${secondary ? 'secondary' : 'primary'} active_npc.`);
+        }
 
-        // const varnType: VarNpcType = check(state.intOperand & 0xffff, VarNpcValid);
-        // if (varnType.type === ScriptVarType.STRING) {
-        //     state.pushString(npc.getVar(varnType.id) as string);
-        // } else {
-        //     state.pushInt(npc.getVar(varnType.id) as number);
-        // }
+        const varnType: VarNpcType = check(state.intOperand & 0xffff, VarNpcValid);
+        if (varnType.type === ScriptVarType.STRING) {
+            state.pushString(npc.getVar(varnType.id) as string);
+        } else {
+            state.pushInt(npc.getVar(varnType.id) as number);
+        }
     },
 
     [ScriptOpcode.POP_VARN]: state => {
-        // const secondary: number = (state.intOperand >> 16) & 0x1;
-        // const npc: Npc | null = secondary ? state._activeNpc2 : state._activeNpc;
+        const secondary: number = (state.intOperand >> 16) & 0x1;
+        const npc: Npc | null = secondary ? state._activeNpc2 : state._activeNpc;
 
-        // if (!npc) {
-        //     throw new Error(`No ${secondary ? 'secondary' : 'primary'} active_npc.`);
-        // }
+        if (!npc) {
+            throw new Error(`No ${secondary ? 'secondary' : 'primary'} active_npc.`);
+        }
 
-        // const varnType: VarNpcType = check(state.intOperand & 0xffff, VarNpcValid);
-        // if (varnType.type === ScriptVarType.STRING) {
-        //     npc.setVar(varnType.id, state.popString());
-        // } else {
-        //     npc.setVar(varnType.id, state.popInt());
-        // }
+        const varnType: VarNpcType = check(state.intOperand & 0xffff, VarNpcValid);
+        if (varnType.type === ScriptVarType.STRING) {
+            npc.setVar(varnType.id, state.popString());
+        } else {
+            npc.setVar(varnType.id, state.popInt());
+        }
     },
 
     [ScriptOpcode.PUSH_INT_LOCAL]: state => {
@@ -286,23 +286,23 @@ const CoreOps: CommandHandlers = {
     },
 
     [ScriptOpcode.PUSH_VARS]: state => {
-        // const varsType: VarSharedType = check(state.intOperand & 0xffff, VarSharedValid);
+        const varsType: VarSharedType = check(state.intOperand & 0xffff, VarSharedValid);
 
-        // if (varsType.type === ScriptVarType.STRING) {
-        //     state.pushString(World.varsString[varsType.id] ?? '');
-        // } else {
-        //     state.pushInt(World.vars[varsType.id]);
-        // }
+        if (varsType.type === ScriptVarType.STRING) {
+            state.pushString(World.varsString[varsType.id] ?? '');
+        } else {
+            state.pushInt(World.vars[varsType.id]);
+        }
     },
 
     [ScriptOpcode.POP_VARS]: state => {
-        // const varsType: VarSharedType = check(state.intOperand & 0xffff, VarSharedValid);
+        const varsType: VarSharedType = check(state.intOperand & 0xffff, VarSharedValid);
 
-        // if (varsType.type === ScriptVarType.STRING) {
-        //     World.varsString[varsType.id] = state.popString();
-        // } else {
-        //     World.vars[varsType.id] = state.popInt();
-        // }
+        if (varsType.type === ScriptVarType.STRING) {
+            World.varsString[varsType.id] = state.popString();
+        } else {
+            World.vars[varsType.id] = state.popInt();
+        }
     }
 };
 

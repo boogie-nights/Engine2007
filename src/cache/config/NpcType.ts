@@ -164,7 +164,7 @@ export default class NpcType extends ConfigType {
     category: number = -1;
     stats: number[] = [1, 1, 1, 1, 1, 1];
     wanderrange: number = 5;
-    maxrange: number = 7;
+    maxrange: number = -1;
     huntrange: number = 0;
     timer: number = -1;
     respawnrate: number = 100;
@@ -208,6 +208,10 @@ export default class NpcType extends ConfigType {
             this.walkanim_l = dat.g2();
         } else if (code === 18) {
             this.category = dat.g2();
+        } else if (code === 26) {
+            this.wanderrange = dat.g2();
+        } else if (code === 27) {
+            this.maxrange = dat.g2();
         } else if (code >= 30 && code < 35) {
             if (!this.op) {
                 this.op = new Array(5).fill(null);
@@ -320,10 +324,6 @@ export default class NpcType extends ConfigType {
             this.field2329 = dat.g1() * 4;
         } else if (code === 119) {
             this.walkflags = dat.g1b();
-        } else if (code === 200) {
-            this.wanderrange = dat.g2();
-        } else if (code === 201) {
-            this.maxrange = dat.g2();
         } else if (code === 202) {
             this.huntrange = dat.g1();
         } else if (code === 203) {
@@ -366,5 +366,12 @@ export default class NpcType extends ConfigType {
     }
 
     postDecode(): void {
+        if (this.maxrange === -1) {
+            this.maxrange = this.wanderrange + 2;
+        }
+
+        if (this.maxrange < this.wanderrange) {
+            this.maxrange = this.wanderrange;
+        }
     }
 }

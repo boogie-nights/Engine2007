@@ -1,9 +1,9 @@
 import ObjType from '#/cache/config/ObjType.js';
-// import { ParamHelper } from '#/cache/config/ParamHelper.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import { ParamHelper } from '#/cache/config/ParamHelper.js';
+import ParamType from '#/cache/config/ParamType.js';
 import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
-import { check, ObjTypeValid } from '#/engine/script/ScriptValidator.js';
+import { check, ObjTypeValid, ParamTypeValid } from '#/engine/script/ScriptValidator.js';
 
 const ObjConfigOps: CommandHandlers = {
     [ScriptOpcode.OC_NAME]: state => {
@@ -15,13 +15,13 @@ const ObjConfigOps: CommandHandlers = {
     [ScriptOpcode.OC_PARAM]: state => {
         const [objId, paramId] = state.popInts(2);
 
-        // const objType: ObjType = check(objId, ObjTypeValid);
-        // const paramType: ParamType = check(paramId, ParamTypeValid);
-        // if (paramType.isString()) {
-        //     state.pushString(ParamHelper.getStringParam(paramType.id, objType, paramType.defaultString));
-        // } else {
-        //     state.pushInt(ParamHelper.getIntParam(paramType.id, objType, paramType.defaultInt));
-        // } todo
+        const objType: ObjType = check(objId, ObjTypeValid);
+        const paramType: ParamType = check(paramId, ParamTypeValid);
+        if (paramType.isString()) {
+            state.pushString(ParamHelper.getStringParam(paramType.id, objType, paramType.defaultString));
+        } else {
+            state.pushInt(ParamHelper.getIntParam(paramType.id, objType, paramType.defaultInt));
+        }
     },
 
     [ScriptOpcode.OC_CATEGORY]: state => {

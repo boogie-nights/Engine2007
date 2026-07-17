@@ -130,10 +130,10 @@ export function encodeVarpOps(ops: VarpOpcode[]): Uint8Array {
 
 export function pack() {
     const varpNameToId = loadNameToIdMap('varp.pack');
-    const configBlocks = readConfigFile('all.varp');
+    const configBlocks    = readConfigFile('.varp');
 
     if (configBlocks.size === 0) {
-        console.error(`No entries found in ${path.join(CONFIG_DIR, 'all.varp')}`);
+        console.error('No .varp entries found');
         return;
     }
 

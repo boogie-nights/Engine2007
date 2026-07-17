@@ -10,8 +10,8 @@ import InvType from '#/cache/config/InvType.js';
 import LocType from '#/cache/config/LocType.js';
 import NpcType from '#/cache/config/NpcType.js';
 import ObjType from '#/cache/config/ObjType.js';
-// import { ParamHelper } from '#/cache/config/ParamHelper.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import { ParamHelper } from '#/cache/config/ParamHelper.js';
+import ParamType from '#/cache/config/ParamType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import SeqType from '#/cache/config/SeqType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.js';
@@ -1644,24 +1644,24 @@ export default class Player extends PathingEntity {
             throw new Error('invTotalParam: Invalid inventory type: ' + inv);
         }
 
-        // const paramType: ParamType = ParamType.get(param);
+        const paramType: ParamType = ParamType.get(param);
 
         let total: number = 0;
-        // for (let slot: number = 0; slot < container.capacity; slot++) {
-        //     const item = container.items[slot];
-        //     if (!item || item.id < 0 || item.id >= ObjType.count) {
-        //         continue;
-        //     }
+        for (let slot: number = 0; slot < container.capacity; slot++) {
+            const item = container.items[slot];
+            if (!item || item.id < 0 || item.id >= ObjType.count) {
+                continue;
+            }
 
-        //     const obj: ObjType = ObjType.get(item.id);
-        //     const value: number = ParamHelper.getIntParam(paramType.id, obj, paramType.defaultInt);
+            const obj: ObjType = ObjType.get(item.id);
+            const value: number = ParamHelper.getIntParam(paramType.id, obj, paramType.defaultInt);
 
-        //     if (stack) {
-        //         total += item.count * value;
-        //     } else {
-        //         total += value;
-        //     }
-        // } todo
+            if (stack) {
+                total += item.count * value;
+            } else {
+                total += value;
+            }
+        }
 
         return total;
     }

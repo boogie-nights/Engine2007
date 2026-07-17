@@ -4,11 +4,11 @@ import Packet from '#/io/Packet.js';
 import Js5Index from '#/js5/Js5Index.js';
 import {
     CACHE_OUT_DIR,
-    CONFIG_DIR,
     loadNameToIdMap,
     assembleGroupBuffer,
     packGroupAuto,
     readFlatFile,
+    findConfigFiles,
 } from '#tools/util/ConfigPackHelper.ts'
 import ColorConversion from '#tools/util/ColorConversion.ts';
 import ObjType from '#/cache/config/ObjType.js';
@@ -601,8 +601,27 @@ export function encodeObjOps(ops: ObjOpcode[]): Uint8Array {
 export function pack() {
     const objNameToId    = loadNameToIdMap('obj.pack');
     const paramNameToId  = loadNameToIdMap('param.pack');
-    const sourceContent  = fs.readFileSync(path.join(CONFIG_DIR, 'all.obj'), 'utf-8');
-    const objOpsById = parseSourceObjs(sourceContent, objNameToId, paramNameToId);
+
+    const files = findConfigFiles('.obj');
+    if (files.size === 0) {
+        console.error('No .obj entries found under BUILD_SRC_DIR/scripts');
+        return;
+    }
+
+    const objOpsById = new Map<number, ObjOpcode[]>();
+
+    for (const file of files) {
+        const sourceContent = fs.readFileSync(file, 'utf-8');
+        const fileOpsById = parseSourceObjs(sourceContent, objNameToId, paramNameToId);
+
+        for (const [id, ops] of fileOpsById) {
+            if (objOpsById.has(id)) {
+                throw new Error(`Duplicate obj config for id ${id} — also found in ${file}`);
+            }
+            objOpsById.set(id, ops);
+        }
+    }
+
     const serverOpsById = objOpsById;
     const clientOpsById = new Map(
         [...objOpsById.entries()].map(([id, ops]) => [

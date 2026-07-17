@@ -682,10 +682,10 @@ export function pack() {
     };
 
     const locLocations = loadLocLocations();
-    const configBlocks = readConfigFile('all.loc');
+    const configBlocks    = readConfigFile('.loc');
 
     if (configBlocks.size === 0) {
-        console.error(`No entries found in ${path.join(CONFIG_DIR, 'all.loc')}`);
+        console.error('No .loc entries found');
         return;
     }
 

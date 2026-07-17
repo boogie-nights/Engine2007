@@ -148,6 +148,10 @@ function buildOp(
             return { code: 16, payload: resolveByMap(b.value, maps.seq, 'seq') };
         case 'category':
             return { code: 18, payload: resolveByMap(b.value, maps.category, 'category') };
+        case 'wanderrange':
+            return { code: 26, payload: b.value };
+        case 'maxrange':
+            return { code: 27, payload: b.value };
         case 'op1': case 'op2': case 'op3': case 'op4': case 'op5': {
             const idx = Number(family.slice(2));
             return { code: 29 + idx, payload: b.value };
@@ -243,10 +247,6 @@ function buildOp(
             return { code: 78, payload: b.value };
         case 'magic':
             return { code: 79, payload: b.value };
-        case 'wanderrange':
-            return { code: 200, payload: b.value };
-        case 'maxrange':
-            return { code: 201, payload: b.value };
         case 'huntrange':
             return { code: 202, payload: b.value };
         case 'timer':

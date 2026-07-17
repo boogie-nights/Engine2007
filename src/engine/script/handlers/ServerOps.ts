@@ -1,8 +1,8 @@
 import { LocLayer, LocAngle } from '@2004scape/rsmod-pathfinder';
 
 // import MesanimType from '#/cache/config/MesanimType.js';
-// import { ParamHelper } from '#/cache/config/ParamHelper.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import { ParamHelper } from '#/cache/config/ParamHelper.js';
+import ParamType from '#/cache/config/ParamType.js';
 // import SpotanimType from '#/cache/config/SpotanimType.js';
 // import StructType from '#/cache/config/StructType.js';
 import { CoordGrid } from '#/engine/CoordGrid.js';
@@ -401,7 +401,7 @@ const ServerOps: CommandHandlers = {
     },
 
     [ScriptOpcode.NPCCOUNT]: state => {
-        // state.pushInt(World.getTotalNpcs());
+        state.pushInt(World.getTotalNpcs());
     },
 
     [ScriptOpcode.ZONECOUNT]: state => {

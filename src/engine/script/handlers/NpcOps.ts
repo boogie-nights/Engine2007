@@ -1,6 +1,6 @@
 import NpcType from '#/cache/config/NpcType.js';
 import { ParamHelper } from '#/cache/config/ParamHelper.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import ParamType from '#/cache/config/ParamType.js';
 // import SpotanimType from '#/cache/config/SpotanimType.js';
 import { CoordGrid } from '#/engine/CoordGrid.js';
 import Entity from '#/engine/entity/Entity.js';
@@ -18,7 +18,7 @@ import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import ScriptPointer, { ActiveNpc, ActivePlayer, checkedHandler } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
 import ScriptState from '#/engine/script/ScriptState.js';
-import { check, CoordValid, DurationValid, HitTypeValid, HuntVisValid, NpcModeValid, NpcStatValid, NpcTypeValid, NumberNotNull, QueueValid } from '#/engine/script/ScriptValidator.js';
+import { check, CoordValid, DurationValid, HitTypeValid, HuntVisValid, ParamTypeValid, NpcModeValid, NpcStatValid, NpcTypeValid, NumberNotNull, QueueValid } from '#/engine/script/ScriptValidator.js';
 import ServerTriggerType from '#/engine/script/ServerTriggerType.js';
 import World from '#/engine/World.js';
 
@@ -130,14 +130,14 @@ const NpcOps: CommandHandlers = {
     }),
 
     [ScriptOpcode.NPC_PARAM]: checkedHandler(ActiveNpc, state => {
-        // const paramType: ParamType = check(state.popInt(), ParamTypeValid);
+        const paramType: ParamType = check(state.popInt(), ParamTypeValid);
 
-        // const npcType: NpcType = check(state.activeNpc.type, NpcTypeValid);
-        // if (paramType.isString()) {
-        //     state.pushString(ParamHelper.getStringParam(paramType.id, npcType, paramType.defaultString));
-        // } else {
-        //     state.pushInt(ParamHelper.getIntParam(paramType.id, npcType, paramType.defaultInt));
-        // }
+        const npcType: NpcType = check(state.activeNpc.type, NpcTypeValid);
+        if (paramType.isString()) {
+            state.pushString(ParamHelper.getStringParam(paramType.id, npcType, paramType.defaultString));
+        } else {
+            state.pushInt(ParamHelper.getIntParam(paramType.id, npcType, paramType.defaultInt));
+        }
     }),
 
     // https://x.com/JagexAsh/status/1570357528172859392

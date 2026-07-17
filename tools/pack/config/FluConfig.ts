@@ -62,10 +62,10 @@ function encodeFlu(
 export function pack() {
     const fluNameToId     = loadNameToIdMap('flu.pack');
     const textureNameToId = loadNameToIdMap('texture.pack');
-    const configBlocks    = readConfigFile('all.flu');
+    const configBlocks    = readConfigFile('.flu');
 
     if (configBlocks.size === 0) {
-        console.error(`No entries found in ${path.join(CONFIG_DIR, 'all.flu')}`);
+        console.error('No .flu entries found');
         return;
     }
 

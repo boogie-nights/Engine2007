@@ -4,11 +4,11 @@ import Packet from '#/io/Packet.js';
 import Js5Index from '#/js5/Js5Index.js';
 import {
     CACHE_OUT_DIR,
-    CONFIG_DIR,
     loadNameToIdMap,
     assembleGroupBuffer,
     packGroupAuto,
     readFlatFile,
+    findConfigFiles,
 } from '#tools/util/ConfigPackHelper.ts';
 
 const CONFIG_ARCHIVE = 2;
@@ -178,7 +178,7 @@ export function parseSourceInvs(
         if (stocks.length > 0) {
             const maxIndex = Math.max(...stocks.map(s => s.index));
             const stockPayload: Array<{ obj: number; count: number; rate: number } | undefined> = Array.from({ length: maxIndex + 1 });
-            
+
             for (const s of stocks) {
                 stockPayload[s.index] = { obj: s.obj, count: s.count, rate: s.rate };
             }
@@ -245,9 +245,30 @@ export function encodeInvOps(ops: InvOpcode[]): Uint8Array {
 export function pack() {
     const invNameToId = loadNameToIdMap('inv.pack');
     const objNameToId = loadNameToIdMap('obj.pack');
-    const sourceContent = fs.readFileSync(path.join(CONFIG_DIR, 'all.inv'), 'utf-8');
-    const invOpsById = parseSourceInvs(sourceContent, invNameToId, objNameToId);
-    
+
+    const files = findConfigFiles('.inv');
+    if (files.size === 0) {
+        console.error('No .inv entries found under BUILD_SRC_DIR/scripts');
+        return;
+    }
+
+    // Gathered per file rather than in one combined blob, so a duplicate inv
+    // id defined in two different .inv files is caught instead of one
+    // silently overwriting the other.
+    const invOpsById = new Map<number, InvOpcode[]>();
+
+    for (const file of files) {
+        const sourceContent = fs.readFileSync(file, 'utf-8');
+        const fileOpsById = parseSourceInvs(sourceContent, invNameToId, objNameToId);
+
+        for (const [id, ops] of fileOpsById) {
+            if (invOpsById.has(id)) {
+                throw new Error(`Duplicate inv config for id ${id} — also found in ${file}`);
+            }
+            invOpsById.set(id, ops);
+        }
+    }
+
     const serverOpsById = invOpsById;
     const clientOpsById = new Map(
         [...invOpsById.entries()].map(([id, ops]) => [

@@ -5,11 +5,11 @@ import { CompileServerScript } from '@lostcityrs/runescript';
 import Component from '#/cache/config/Component.js';
 // import DbTableType from '#/cache/config/DbTableType.js';
 import InvType from '#/cache/config/InvType.js';
-// import ParamType from '#/cache/config/ParamType.js';
+import ParamType from '#/cache/config/ParamType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
-// import VarNpcType from '#/cache/config/VarNpcType.js';
+import VarNpcType from '#/cache/config/VarNpcType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.js';
-// import VarSharedType from '#/cache/config/VarSharedType.js';
+import VarSharedType from '#/cache/config/VarSharedType.js';
 import { NpcModeMap } from '#/engine/entity/NpcMode.js';
 import { NpcStatMap } from '#/engine/entity/NpcStat.js';
 import { PlayerStatMap } from '#/engine/entity/PlayerStat.js';
@@ -265,35 +265,44 @@ export async function runServerCompiler() {
         varbitInfo.protect[id] = basevar.protect;
     }
 
-    // VarNpcType.load('data/pack');
-    // for (let id = 0; id <= varnInfo.max; id++) {
-    //     if (typeof varpInfo.map[id] === 'undefined') {
-    //         continue;
-    //     }
+    const varnIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 6: 'varn.pack' });
+    if (varnIndex.isGroupValid(6)) {
+        VarNpcType.load(varnIndex);
+    }
+    for (let id = 0; id <= varnInfo.max; id++) {
+        if (typeof varnInfo.map[id] === 'undefined') {
+            continue;
+        }
 
-    //     const varn = VarNpcType.get(id);
-    //     varnInfo.vartype[id] = ScriptVarType.getType(varn.type);
-    // }
+        const varn = VarNpcType.get(id);
+        varnInfo.vartype[id] = ScriptVarType.getType(varn.type);
+    }
 
-    // VarSharedType.load('data/pack');
-    // for (let id = 0; id <= varsInfo.max; id++) {
-    //     if (typeof varsInfo.map[id] === 'undefined') {
-    //         continue;
-    //     }
+    const varsIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 7: 'vars.pack' });
+    if (varsIndex.isGroupValid(7)) {
+        VarSharedType.load(varsIndex);
+    }
+    for (let id = 0; id <= varsInfo.max; id++) {
+        if (typeof varsInfo.map[id] === 'undefined') {
+            continue;
+        }
 
-    //     const vars = VarSharedType.get(id);
-    //     varsInfo.vartype[id] = ScriptVarType.getType(vars.type);
-    // }
+        const vars = VarSharedType.get(id);
+        varsInfo.vartype[id] = ScriptVarType.getType(vars.type);
+    }
 
-    // ParamType.load('data/pack');
-    // for (let id = 0; id <= paramInfo.max; id++) {
-    //     if (typeof paramInfo.map[id] === 'undefined') {
-    //         continue;
-    //     }
+    const paramIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [11]);
+    if (paramIndex) {
+        ParamType.load(paramIndex);
+    }
+    for (let id = 0; id <= paramInfo.max; id++) {
+        if (typeof paramInfo.map[id] === 'undefined') {
+            continue;
+        }
 
-    //     const param = ParamType.get(id);
-    //     paramInfo.vartype[id] = param.getType();
-    // }
+        const param = ParamType.get(id);
+        paramInfo.vartype[id] = param.getType();
+    }
 
     // DbTableType.load('data/pack');
     // for (let id = 0; id <= dbtableInfo.max; id++) {

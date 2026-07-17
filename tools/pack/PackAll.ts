@@ -31,6 +31,11 @@ import { pack as packObj } from './config/ObjConfig.ts';
 import { pack as packLoc } from './config/LocConfig.ts';
 import { pack as packIf } from './interface/pack.ts';
 import { pack as packNpc } from './config/NpcConfig.ts';
+import { pack as packVarn } from './config/VarnConfig.ts';
+import { pack as packVars } from './config/VarsConfig.ts';
+import { pack as packEnum } from './config/EnumConfig.ts';
+import { pack as packParam } from './config/ParamConfig.ts';
+import OpenRs2 from '#/util/OpenRs2.ts';
 
 export async function packAll(modelFlags: number[]) {
     if (parentPort) {
@@ -42,6 +47,9 @@ export async function packAll(modelFlags: number[]) {
 
     clearFsCache();
     console.error('(First run only) Delete entire data/cache and let it redownload... and then empty keys.json and run map packer !');
+    await OpenRs2.RS2_500.predownload();
+    await OpenRs2.RS2_500.loadKeys();
+    await OpenRs2.RS2_500.loadMapIndex();
     console.warn('Inefficiently packing configs every time...');
     await packVarps();
     await packVarbits();
@@ -53,6 +61,10 @@ export async function packAll(modelFlags: number[]) {
     await packLoc();
     await packIf();
     await packNpc();
+    await packVarn();
+    await packVars();
+    await packEnum();
+    await packParam();
     
     // revalidatePack();
 
