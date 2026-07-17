@@ -94,6 +94,18 @@ function resolveObjRef(value: string, nameToId: Map<string, number>): number {
 
     return parseInt2(trimmed, 'obj ref');
 }
+function resolveNumeric(val: string, prefix: string): number {
+    const m = val.match(new RegExp(`^${prefix}_(\\d+)$`));
+    if (m) return parseInt(m[1], 10);
+    const n = parseInt(val, 10);
+    return isNaN(n) ? -1 : n;
+}
+
+function resolveByMap(val: string, map: Map<string, number>, prefix: string): number {
+    const byName = map.get(val);
+    if (byName !== undefined) return byName;
+    return resolveNumeric(val, prefix);
+}
 
 function resolveParamId(name: string, paramNameToId: Map<string, number>): number {
     const id = paramNameToId.get(name.trim());
@@ -106,7 +118,8 @@ function resolveParamId(name: string, paramNameToId: Map<string, number>): numbe
 export function parseSourceObjs(
     content: string,
     nameToId: Map<string, number>,
-    paramNameToId: Map<string, number>
+    paramNameToId: Map<string, number>,
+    categoryNameToId: Map<string, number>
 ): Map<number, ObjOpcode[]> {
     const sections = parseObjSourceSections(content);
     const byId = new Map<number, ObjOpcode[]>();
@@ -353,7 +366,7 @@ export function parseSourceObjs(
             }
 
             if (key === 'category') {
-                ops.push({ code: 94, payload: parseInt2(vt, key) });
+                ops.push({ code: 94, payload: resolveByMap(vt, categoryNameToId, 'category') });
                 continue;
             }
 
@@ -601,6 +614,7 @@ export function encodeObjOps(ops: ObjOpcode[]): Uint8Array {
 export function pack() {
     const objNameToId    = loadNameToIdMap('obj.pack');
     const paramNameToId  = loadNameToIdMap('param.pack');
+    const categoryNameToId = loadNameToIdMap('category.pack');
 
     const files = findConfigFiles('.obj');
     if (files.size === 0) {
@@ -612,7 +626,7 @@ export function pack() {
 
     for (const file of files) {
         const sourceContent = fs.readFileSync(file, 'utf-8');
-        const fileOpsById = parseSourceObjs(sourceContent, objNameToId, paramNameToId);
+        const fileOpsById = parseSourceObjs(sourceContent, objNameToId, paramNameToId, categoryNameToId);
 
         for (const [id, ops] of fileOpsById) {
             if (objOpsById.has(id)) {
