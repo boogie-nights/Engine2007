@@ -1,0 +1,14 @@
+import { CoordGrid } from '#/engine/CoordGrid.js';
+import Packet from '#/io/Packet.js';
+import ServerGameMessageEncoder from '#/network/game/server/ServerGameMessageEncoder.js';
+import ServerGameProt from '#/network/game/server/prot/ServerGameProt.js';
+import UpdateZoneFullFollows from '#/network/game/server/model/UpdateZoneFullFollows.ts';
+
+export default class UpdateZoneFullFollowsEncoder extends ServerGameMessageEncoder<UpdateZoneFullFollows> {
+    prot = ServerGameProt.UPDATE_ZONE_FULL_FOLLOWS;
+
+    encode(buf: Packet, message: UpdateZoneFullFollows): void {
+        buf.p1_alt1((message.zoneX << 3) - CoordGrid.zoneOrigin(message.originX));
+        buf.p1_alt2((message.zoneZ << 3) - CoordGrid.zoneOrigin(message.originZ));
+    }
+}

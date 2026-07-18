@@ -39,6 +39,8 @@ import OpenRs2 from '#/util/OpenRs2.ts';
 import { pack as packHunt} from './config/HuntConfig.ts';
 import { pack as packStruct} from './config/StructConfig.ts';
 import { pack as packCategory } from './config/Category.ts';
+import { pack as packMesAnim } from './config/MesAnimConfig.ts';
+import { pack as packSpot } from './config/SpotConfig.ts';
 
 export async function packAll(modelFlags: number[]) {
     if (parentPort) {
@@ -71,6 +73,8 @@ export async function packAll(modelFlags: number[]) {
     await packHunt();
     await packStruct();
     await packCategory();
+    await packMesAnim();
+    await packSpot();
     
     // revalidatePack();
 

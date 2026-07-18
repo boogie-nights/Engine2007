@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { ConfigType } from '#/cache/config/ConfigType.js';
 import { HuntCheckNotTooStrong } from '#/engine/entity/hunt/HuntCheckNotTooStrong.js';
 import { HuntModeType } from '#/engine/entity/hunt/HuntModeType.js';
@@ -5,14 +6,37 @@ import { HuntNobodyNear } from '#/engine/entity/hunt/HuntNobodyNear.js';
 import { HuntVis } from '#/engine/entity/hunt/HuntVis.js';
 import { NpcMode } from '#/engine/entity/NpcMode.js';
 import Packet from '#/io/Packet.js';
-import Js5Index from '#/js5/Js5Index.js';
-
-const HUNT_GROUP = 9;
 
 export default class HuntType extends ConfigType {
     static configNames: Map<string, number> = new Map();
     static configs: HuntType[] = [];
-    static count: number = 0;
+
+    static load(dir: string): void {
+        if (!fs.existsSync(`${dir}/server/hunt.dat`)) {
+            return;
+        }
+
+        const dat = Packet.load(`${dir}/server/hunt.dat`);
+        this.parse(dat);
+    }
+
+    static parse(dat: Packet): void {
+        HuntType.configNames = new Map();
+        HuntType.configs = [];
+
+        const count = dat.g2();
+
+        for (let id = 0; id < count; id++) {
+            const config = new HuntType(id);
+            config.decodeType(dat);
+
+            HuntType.configs[id] = config;
+
+            if (config.debugname) {
+                HuntType.configNames.set(config.debugname.toLowerCase(), id);
+            }
+        }
+    }
 
     static get(id: number): HuntType {
         return HuntType.configs[id];
@@ -30,44 +54,8 @@ export default class HuntType extends ConfigType {
         return this.get(id);
     }
 
-    static load(index: Js5Index): void {
-        const groupSize = index.groupSize[HUNT_GROUP];
-        if (!groupSize) {
-            HuntType.count = 0;
-            return;
-        }
-
-        if (!index.packed[HUNT_GROUP] || Object.keys(index.unpacked[HUNT_GROUP] ?? {}).length === 0) {
-            if (!index.unpackGroup(HUNT_GROUP)) {
-                HuntType.count = 0;
-                return;
-            }
-        }
-
-        HuntType.configs = new Array(groupSize);
-        HuntType.configNames.clear();
-
-        let loadedCount = 0;
-        const fileIds = index.fileIds[HUNT_GROUP];
-
-        for (let i = 0; i < groupSize; i++) {
-            const fileId = fileIds ? fileIds[i] : i;
-            const data = index.unpacked[HUNT_GROUP]?.[fileId];
-            if (!data) continue;
-
-            const type = new HuntType(fileId);
-            type.decodeType(new Packet(data));
-            type.postDecode();
-
-            HuntType.configs[fileId] = type;
-            loadedCount++;
-
-            if (type.debugname) {
-                HuntType.configNames.set(type.debugname.toLowerCase(), fileId);
-            }
-        }
-
-        HuntType.count = loadedCount;
+    static get count(): number {
+        return this.configs.length;
     }
 
     public checkHuntCondition(value: number, condition: string, checkValue: number): boolean {

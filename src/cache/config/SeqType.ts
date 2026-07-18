@@ -23,38 +23,23 @@ export default class SeqType extends ConfigType {
         return this.get(id);
     }
 
-    static getGroupId(id: number): number {
-        return id & 0x7f;
-    }
-
-    static getFileId(id: number): number {
-        return id >>> 7;
-    }
-
     static load(index: Js5Index): void {
         const groupCount = index.capacity;
 
-        let maxId = -1;
+        let totalSlots = 0;
         for (let g = 0; g < groupCount; g++) {
-            const groupSize = index.groupSize[g];
-            if (groupSize === 0) continue;
-
-            const fileIds = index.fileIds[g];
-            for (let i = 0; i < groupSize; i++) {
-                const fileId = fileIds ? fileIds[i] : i;
-                const id = (fileId << 7) | g;
-                if (id > maxId) maxId = id;
-            }
+            totalSlots += index.groupSize[g] ?? 0;
         }
 
-        if (maxId === -1) {
+        if (totalSlots === 0) {
             SeqType.count = 0;
             return;
         }
 
-        SeqType.configs = new Array(maxId + 1);
+        SeqType.configs = new Array(totalSlots);
         SeqType.configNames.clear();
 
+        let nextId = 0;
         let loadedCount = 0;
 
         for (let g = 0; g < groupCount; g++) {
@@ -71,10 +56,10 @@ export default class SeqType extends ConfigType {
 
             for (let i = 0; i < groupSize; i++) {
                 const fileId = fileIds ? fileIds[i] : i;
+                const id = nextId++;
+
                 const data = index.unpacked[g]?.[fileId];
                 if (!data) continue;
-
-                const id = (fileId << 7) | g;
 
                 const type = new SeqType(id);
                 type.decodeType(new Packet(data));

@@ -265,31 +265,8 @@ export async function runServerCompiler() {
         varbitInfo.protect[id] = basevar.protect;
     }
 
-    const varnIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 6: 'varn.pack' });
-    if (varnIndex.isGroupValid(6)) {
-        VarNpcType.load(varnIndex);
-    }
-    for (let id = 0; id <= varnInfo.max; id++) {
-        if (typeof varnInfo.map[id] === 'undefined') {
-            continue;
-        }
-
-        const varn = VarNpcType.get(id);
-        varnInfo.vartype[id] = ScriptVarType.getType(varn.type);
-    }
-
-    const varsIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 7: 'vars.pack' });
-    if (varsIndex.isGroupValid(7)) {
-        VarSharedType.load(varsIndex);
-    }
-    for (let id = 0; id <= varsInfo.max; id++) {
-        if (typeof varsInfo.map[id] === 'undefined') {
-            continue;
-        }
-
-        const vars = VarSharedType.get(id);
-        varsInfo.vartype[id] = ScriptVarType.getType(vars.type);
-    }
+    VarNpcType.load('data/pack');
+    VarSharedType.load('data/pack');
 
     const paramIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [11]);
     if (paramIndex) {

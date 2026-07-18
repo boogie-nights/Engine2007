@@ -24,6 +24,10 @@ export default class ServerGameProt {
     static readonly UPDATE_RUNWEIGHT = new ServerGameProt(54, 2);
     static readonly UPDATE_STAT = new ServerGameProt(204, 6);
 
+    static readonly UPDATE_ZONE_FULL_FOLLOWS = new ServerGameProt(88, 2);
+    static readonly UPDATE_ZONE_PARTIAL_FOLLOWS = new ServerGameProt(163, 2);
+    static readonly UPDATE_ZONE_PARTIAL_ENCLOSED = new ServerGameProt(134, -2);
+
     constructor(
         readonly id: number,
         readonly length: number

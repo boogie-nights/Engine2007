@@ -18,13 +18,13 @@ import HuntType from '#/cache/config/HuntType.js';
 // import IdkType from '#/cache/config/IdkType.js';
 import InvType from '#/cache/config/InvType.js';
 import LocType from '#/cache/config/LocType.js';
-// import MesanimType from '#/cache/config/MesanimType.js';
+import MesAnimType from '#/cache/config/MesAnimType.js';
 import NpcType from '#/cache/config/NpcType.js';
 import ObjType from '#/cache/config/ObjType.js';
 import ParamType from '#/cache/config/ParamType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import SeqType from '#/cache/config/SeqType.js';
-// import SpotanimType from '#/cache/config/SpotanimType.js';
+import SpotAnimType from '#/cache/config/SpotAnimType.js';
 import StructType from '#/cache/config/StructType.js';
 import VarNpcType from '#/cache/config/VarNpcType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.js';
@@ -232,8 +232,10 @@ class World {
 
     reload(clearInvs: boolean = true): void {
         // IdkType.load('data/pack');
-        // SpotanimType.load('data/pack');
         CategoryType.load('data/pack');
+        HuntType.load('data/pack');
+        VarNpcType.load('data/pack');
+        VarSharedType.load('data/pack');
 
         if (clearInvs) {
             this.invs.clear();
@@ -255,7 +257,6 @@ class World {
             }
         }
 
-        // MesanimType.load('data/pack');
         // DbTableType.load('data/pack');
         // DbRowType.load('data/pack');
         // DbTableIndex.init();
@@ -321,19 +322,9 @@ class World {
             InvType.load(invIndex);
         }
 
-        const varnIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 6: 'varn.pack' });
-        if (varnIndex.isGroupValid(6)) {
-            VarNpcType.load(varnIndex);
-        }
-
-        const varsIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 7: 'vars.pack' });
-        if (varsIndex.isGroupValid(7)) {
-            VarSharedType.load(varsIndex);
-        }
-
-        const huntIndex = await OpenRs2.RS2_500.loadLocalGeneratedIndex(2, { 9: 'hunt.pack' });
-        if (huntIndex.isGroupValid(9)) {
-            HuntType.load(huntIndex);
+        const mesAnimIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [7]);
+        if (mesAnimIndex) {
+            MesAnimType.load(mesAnimIndex);
         }
 
         const paramIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [11]);
@@ -379,6 +370,12 @@ class World {
         const NpcIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(18);
         if (NpcIndex) {
             NpcType.load(NpcIndex);
+        }
+
+        
+        const spotIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(21);
+        if (spotIndex) {
+            SpotAnimType.load(spotIndex);
         }
 
         if (!Environment.STANDALONE_BUNDLE) {

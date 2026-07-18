@@ -1,7 +1,7 @@
 import NpcType from '#/cache/config/NpcType.js';
 import { ParamHelper } from '#/cache/config/ParamHelper.js';
 import ParamType from '#/cache/config/ParamType.js';
-// import SpotanimType from '#/cache/config/SpotanimType.js';
+import SpotAnimType from '#/cache/config/SpotAnimType.js';
 import { CoordGrid } from '#/engine/CoordGrid.js';
 import Entity from '#/engine/entity/Entity.js';
 import { EntityLifeCycle } from '#/engine/entity/EntityLifeCycle.js';
@@ -18,7 +18,7 @@ import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import ScriptPointer, { ActiveNpc, ActivePlayer, checkedHandler } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
 import ScriptState from '#/engine/script/ScriptState.js';
-import { check, CategoryTypeValid, CoordValid, DurationValid, HitTypeValid, HuntVisValid, HuntTypeValid, ParamTypeValid, NpcModeValid, NpcStatValid, NpcTypeValid, NumberNotNull, QueueValid } from '#/engine/script/ScriptValidator.js';
+import { check, CategoryTypeValid, CoordValid, DurationValid, HitTypeValid, HuntVisValid, HuntTypeValid, ParamTypeValid, SpotAnimTypeValid, NpcModeValid, NpcStatValid, NpcTypeValid, NumberNotNull, QueueValid } from '#/engine/script/ScriptValidator.js';
 import ServerTriggerType from '#/engine/script/ServerTriggerType.js';
 import World from '#/engine/World.js';
 
@@ -280,11 +280,11 @@ const NpcOps: CommandHandlers = {
     }),
 
     [ScriptOpcode.SPOTANIM_NPC]: checkedHandler(ActiveNpc, state => {
-        // const delay = check(state.popInt(), NumberNotNull);
-        // const height = check(state.popInt(), NumberNotNull);
-        // const spotanimType: SpotanimType = check(state.popInt(), SpotAnimTypeValid);
+        const delay = check(state.popInt(), NumberNotNull);
+        const height = check(state.popInt(), NumberNotNull);
+        const spotanimType: SpotAnimType = check(state.popInt(), SpotAnimTypeValid);
 
-        // state.activeNpc.spotanim(spotanimType.id, height, delay);
+        state.activeNpc.spotanim(spotanimType.id, height, delay);
     }),
 
     // https://x.com/JagexAsh/status/1796460129430433930

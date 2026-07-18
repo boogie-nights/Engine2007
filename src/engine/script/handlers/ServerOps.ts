@@ -1,9 +1,9 @@
 import { LocLayer, LocAngle } from '@2004scape/rsmod-pathfinder';
 
-// import MesanimType from '#/cache/config/MesanimType.js';
+import MesanimType from '#/cache/config/MesAnimType.js';
 import { ParamHelper } from '#/cache/config/ParamHelper.js';
 import ParamType from '#/cache/config/ParamType.js';
-// import SpotanimType from '#/cache/config/SpotanimType.js';
+import SpotAnimType from '#/cache/config/SpotAnimType.js';
 import StructType from '#/cache/config/StructType.js';
 import { CoordGrid } from '#/engine/CoordGrid.js';
 import { HuntModeType } from '#/engine/entity/hunt/HuntModeType.js';
@@ -17,7 +17,7 @@ import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import { ActiveNpc, ActivePlayer } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
 import ScriptState from '#/engine/script/ScriptState.js';
-import { check, CoordValid, HuntVisValid, NumberNotNull, NumberPositive, FindSquareValid, SeqTypeValid, StructTypeValid, ParamTypeValid, LocTypeValid } from '#/engine/script/ScriptValidator.js';
+import { check, CoordValid, HuntVisValid, MesanimValid, NumberNotNull, NumberPositive, FindSquareValid, SpotAnimTypeValid, SeqTypeValid, StructTypeValid, ParamTypeValid, LocTypeValid } from '#/engine/script/ScriptValidator.js';
 import World from '#/engine/World.js';
 import Environment from '#/util/Environment.js';
 
@@ -175,12 +175,12 @@ const ServerOps: CommandHandlers = {
     },
 
     [ScriptOpcode.SPOTANIM_MAP]: state => {
-        // const [spotanim, coord, height, delay] = state.popInts(4);
+        const [spotanim, coord, height, delay] = state.popInts(4);
 
-        // const position: CoordGrid = check(coord, CoordValid);
-        // const spotanimType: SpotanimType = check(spotanim, SpotAnimTypeValid);
+        const position: CoordGrid = check(coord, CoordValid);
+        const spotanimType: SpotAnimType = check(spotanim, SpotAnimTypeValid);
 
-        // World.animMap(position.level, position.x, position.z, spotanimType.id, height, delay);
+        World.animMap(position.level, position.x, position.z, spotanimType.id, height, delay);
     },
 
     [ScriptOpcode.DISTANCE]: state => {
@@ -248,7 +248,7 @@ const ServerOps: CommandHandlers = {
             return;
         }
 
-        // state.pushInt(check(state.splitMesanim, MesanimValid).len[state.splitPages[page].length - 1]);
+        state.pushInt(check(state.splitMesanim, MesanimValid).len[state.splitPages[page].length - 1]);
     },
 
     [ScriptOpcode.STRUCT_PARAM]: state => {
@@ -318,44 +318,44 @@ const ServerOps: CommandHandlers = {
     },
 
     [ScriptOpcode.PROJANIM_PL]: state => {
-        // const [srcCoord, uid, spotanim, srcHeight, dstHeight, delay, duration, peak, arc] = state.popInts(9);
+        const [srcCoord, uid, spotanim, srcHeight, dstHeight, delay, duration, peak, arc] = state.popInts(9);
 
-        // const srcPos: CoordGrid = check(srcCoord, CoordValid);
-        // const spotanimType: SpotanimType = check(spotanim, SpotAnimTypeValid);
+        const srcPos: CoordGrid = check(srcCoord, CoordValid);
+        const spotanimType: SpotAnimType = check(spotanim, SpotAnimTypeValid);
 
-        // const player = World.getPlayerByUid(uid);
-        // if (!player) {
-        //     throw new Error(`attempted to use invalid player uid: ${uid}`);
-        // }
+        const player = World.getPlayerByUid(uid);
+        if (!player) {
+            throw new Error(`attempted to use invalid player uid: ${uid}`);
+        }
 
-        // World.mapProjAnim(srcPos.level, srcPos.x, srcPos.z, player.x, player.z, -player.pid - 1, spotanimType.id, srcHeight, dstHeight, delay, duration, peak, arc);
+        World.mapProjAnim(srcPos.level, srcPos.x, srcPos.z, player.x, player.z, -player.pid - 1, spotanimType.id, srcHeight, dstHeight, delay, duration, peak, arc);
     },
 
     [ScriptOpcode.PROJANIM_NPC]: state => {
-        // const [srcCoord, npcUid, spotanim, srcHeight, dstHeight, delay, duration, peak, arc] = state.popInts(9);
+        const [srcCoord, npcUid, spotanim, srcHeight, dstHeight, delay, duration, peak, arc] = state.popInts(9);
 
-        // const srcPos: CoordGrid = check(srcCoord, CoordValid);
-        // const spotanimType: SpotanimType = check(spotanim, SpotAnimTypeValid);
+        const srcPos: CoordGrid = check(srcCoord, CoordValid);
+        const spotanimType: SpotAnimType = check(spotanim, SpotAnimTypeValid);
 
-        // const slot = npcUid & 0xffff;
-        // // const _expectedType = (npcUid >> 16) & 0xffff;
+        const slot = npcUid & 0xffff;
+        // const _expectedType = (npcUid >> 16) & 0xffff;
 
-        // const npc = World.getNpc(slot);
-        // if (!npc) {
-        //     throw new Error(`attempted to use invalid npc uid: ${npcUid}`);
-        // }
+        const npc = World.getNpc(slot);
+        if (!npc) {
+            throw new Error(`attempted to use invalid npc uid: ${npcUid}`);
+        }
 
-        // World.mapProjAnim(srcPos.level, srcPos.x, srcPos.z, npc.x, npc.z, npc.nid + 1, spotanimType.id, srcHeight, dstHeight, delay, duration, peak, arc);
+        World.mapProjAnim(srcPos.level, srcPos.x, srcPos.z, npc.x, npc.z, npc.nid + 1, spotanimType.id, srcHeight, dstHeight, delay, duration, peak, arc);
     },
 
     [ScriptOpcode.PROJANIM_MAP]: state => {
-        // const [srcCoord, dstCoord, spotanim, srcHeight, dstHeight, delay, duration, peak, arc] = state.popInts(9);
+        const [srcCoord, dstCoord, spotanim, srcHeight, dstHeight, delay, duration, peak, arc] = state.popInts(9);
 
-        // const spotanimType: SpotanimType = check(spotanim, SpotAnimTypeValid);
-        // const srcPos: CoordGrid = check(srcCoord, CoordValid);
-        // const dstPos: CoordGrid = check(dstCoord, CoordValid);
+        const spotanimType: SpotAnimType = check(spotanim, SpotAnimTypeValid);
+        const srcPos: CoordGrid = check(srcCoord, CoordValid);
+        const dstPos: CoordGrid = check(dstCoord, CoordValid);
 
-        // World.mapProjAnim(srcPos.level, srcPos.x, srcPos.z, dstPos.x, dstPos.z, 0, spotanimType.id, srcHeight, dstHeight, delay, duration, peak, arc);
+        World.mapProjAnim(srcPos.level, srcPos.x, srcPos.z, dstPos.x, dstPos.z, 0, spotanimType.id, srcHeight, dstHeight, delay, duration, peak, arc);
     },
 
     [ScriptOpcode.MAP_LOCADDUNSAFE]: state => {

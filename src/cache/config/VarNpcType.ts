@@ -1,14 +1,38 @@
+import fs from 'fs';
 import { ConfigType } from '#/cache/config/ConfigType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import Packet from '#/io/Packet.js';
-import Js5Index from '#/js5/Js5Index.js';
-
-const VARN_GROUP = 6;
 
 export default class VarNpcType extends ConfigType {
     static configNames: Map<string, number> = new Map();
     static configs: VarNpcType[] = [];
-    static count: number = 0;
+
+    static load(dir: string): void {
+        if (!fs.existsSync(`${dir}/server/varn.dat`)) {
+            return;
+        }
+
+        const dat = Packet.load(`${dir}/server/varn.dat`);
+        this.parse(dat);
+    }
+
+    static parse(dat: Packet): void {
+        VarNpcType.configNames = new Map();
+        VarNpcType.configs = [];
+
+        const count = dat.g2();
+
+        for (let id = 0; id < count; id++) {
+            const config = new VarNpcType(id);
+            config.decodeType(dat);
+
+            VarNpcType.configs[id] = config;
+
+            if (config.debugname) {
+                VarNpcType.configNames.set(config.debugname.toLowerCase(), id);
+            }
+        }
+    }
 
     static get(id: number): VarNpcType {
         return VarNpcType.configs[id];
@@ -26,45 +50,11 @@ export default class VarNpcType extends ConfigType {
         return this.get(id);
     }
 
-    static load(index: Js5Index): void {
-        const groupSize = index.groupSize[VARN_GROUP];
-        if (!groupSize) {
-            VarNpcType.count = 0;
-            return;
-        }
-
-        if (!index.packed[VARN_GROUP] || Object.keys(index.unpacked[VARN_GROUP] ?? {}).length === 0) {
-            if (!index.unpackGroup(VARN_GROUP)) {
-                VarNpcType.count = 0;
-                return;
-            }
-        }
-
-        VarNpcType.configs = new Array(groupSize);
-        VarNpcType.configNames.clear();
-
-        let loadedCount = 0;
-        const fileIds = index.fileIds[VARN_GROUP];
-
-        for (let i = 0; i < groupSize; i++) {
-            const fileId = fileIds ? fileIds[i] : i;
-            const data = index.unpacked[VARN_GROUP]?.[fileId];
-            if (!data) continue;
-
-            const type = new VarNpcType(fileId);
-            type.decodeType(new Packet(data));
-            type.postDecode();
-
-            VarNpcType.configs[fileId] = type;
-            loadedCount++;
-
-            if (type.debugname) {
-                VarNpcType.configNames.set(type.debugname.toLowerCase(), fileId);
-            }
-        }
-
-        VarNpcType.count = loadedCount;
+    static get count(): number {
+        return this.configs.length;
     }
+
+    // ----
 
     type: number = ScriptVarType.INT;
 

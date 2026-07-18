@@ -13,7 +13,7 @@ import { ZoneEventType } from '#/engine/zone/ZoneEventType.ts';
 import ZoneMap from '#/engine/zone/ZoneMap.js';
 import Packet from '#/io/Packet.js';
 import ServerGameZoneMessageEncoder from '#/network/game/server/ServerGameZoneMessageEncoder.js';
-// import LocAddChange from '#/network/game/server/model/LocAddChange.js';
+import LocAddChange from '#/network/game/server/model/LocAddChange.js';
 // import LocAnim from '#/network/game/server/model/LocAnim.js';
 // import LocDel from '#/network/game/server/model/LocDel.js';
 // import LocMerge from '#/network/game/server/model/LocMerge.js';
@@ -23,9 +23,9 @@ import ServerGameZoneMessageEncoder from '#/network/game/server/ServerGameZoneMe
 // import ObjCount from '#/network/game/server/model/ObjCount.js';
 // import ObjDel from '#/network/game/server/model/ObjDel.js';
 // import ObjReveal from '#/network/game/server/model/ObjReveal.js';
-// import UpdateZoneFullFollows from '#/network/game/server/model/UpdateZoneFullFollows.js';
-// import UpdateZonePartialEnclosed from '#/network/game/server/model/UpdateZonePartialEnclosed.js';
-// import UpdateZonePartialFollows from '#/network/game/server/model/UpdateZonePartialFollows.js';
+import UpdateZoneFullFollows from '#/network/game/server/model/UpdateZoneFullFollows.ts';
+import UpdateZonePartialEnclosed from '#/network/game/server/model/UpdateZonePartialEnclosed.ts';
+import UpdateZonePartialFollows from '#/network/game/server/model/UpdateZonePartialFollows.ts';
 import ServerGameZoneMessage from '#/network/game/server/ServerGameZoneMessage.js';
 import Environment from '#/util/Environment.js';
 import LinkList from '#/util/LinkList.ts';
@@ -102,7 +102,6 @@ export default class Zone {
     computeShared(): void {
         const buf: Packet = Packet.alloc(5000);
         for (const event of this.enclosed()) {
-            console.log(event.message);
             const encoder: ServerGameZoneMessageEncoder<ServerGameZoneMessage> | undefined = ServerGameProtRepository.getZoneEncoder(event.message);
             if (typeof encoder === 'undefined') {
                 continue;
@@ -133,12 +132,12 @@ export default class Zone {
     writeFullFollows(player: Player): void {
         const currentTick: number = World.currentTick;
         // full update necessary to clear client zone memory
-        // player.write(new UpdateZoneFullFollows(this.x, this.z, player.originX, player.originZ));
+        player.write(new UpdateZoneFullFollows(this.x, this.z, player.originX, player.originZ));
         for (const obj of this.getAllObjsUnsafe()) {
             if (obj.lastLifecycleTick === currentTick || (obj.receiver64 !== Obj.NO_RECEIVER && obj.receiver64 !== player.hash64)) {
                 continue;
             }
-            // player.write(new UpdateZonePartialFollows(this.x, this.z, player.originX, player.originZ));
+            player.write(new UpdateZonePartialFollows(this.x, this.z, player.originX, player.originZ));
             // if (obj.lifecycle === EntityLifeCycle.DESPAWN && obj.isActive) {
             //     player.write(new ObjAdd(CoordGrid.packZoneCoord(obj.x, obj.z), obj.type, obj.count));
             // } else if (obj.lifecycle === EntityLifeCycle.RESPAWN && obj.isActive) {
@@ -149,18 +148,18 @@ export default class Zone {
             if (loc.lastLifecycleTick === currentTick) {
                 continue;
             }
-            // // Send dynamic locs to the client
-            // if (loc.lifecycle === EntityLifeCycle.DESPAWN && loc.isActive) {
-            //     player.write(new LocAddChange(CoordGrid.packZoneCoord(loc.x, loc.z), loc.type, loc.shape, loc.angle));
-            // }
-            // // Inform the client that a static loc is not currently active
+            // Send dynamic locs to the client
+            if (loc.lifecycle === EntityLifeCycle.DESPAWN && loc.isActive) {
+                player.write(new LocAddChange(CoordGrid.packZoneCoord(loc.x, loc.z), loc.type, loc.shape, loc.angle));
+            }
+            // Inform the client that a static loc is not currently active
             // else if (loc.lifecycle === EntityLifeCycle.RESPAWN && !loc.isActive) {
             //     player.write(new LocDel(CoordGrid.packZoneCoord(loc.x, loc.z), loc.shape, loc.angle));
             // }
-            // // Send 'changed' static locs to the client
-            // else if (loc.lifecycle === EntityLifeCycle.RESPAWN && loc.isChanged()) {
-            //     player.write(new LocAddChange(CoordGrid.packZoneCoord(loc.x, loc.z), loc.type, loc.shape, loc.angle));
-            // }
+            // Send 'changed' static locs to the client
+            else if (loc.lifecycle === EntityLifeCycle.RESPAWN && loc.isChanged()) {
+                player.write(new LocAddChange(CoordGrid.packZoneCoord(loc.x, loc.z), loc.type, loc.shape, loc.angle));
+            }
         }
     }
 
@@ -175,7 +174,7 @@ export default class Zone {
         if (!this.shared) {
             return;
         }
-        // player.write(new UpdateZonePartialEnclosed(this.x, this.z, player.originX, player.originZ, this.shared));
+        player.write(new UpdateZonePartialEnclosed(this.x, this.z, player.originX, player.originZ, this.shared));
     }
 
     /**
@@ -185,7 +184,7 @@ export default class Zone {
         if (this.events.size === 0) {
             return;
         }
-        // player.write(new UpdateZonePartialFollows(this.x, this.z, player.originX, player.originZ));
+        player.write(new UpdateZonePartialFollows(this.x, this.z, player.originX, player.originZ));
         for (const event of this.follows()) {
             if (event.receiver64 !== Obj.NO_RECEIVER && event.receiver64 !== player.hash64) {
                 continue;
@@ -224,7 +223,7 @@ export default class Zone {
         }
         loc.revert();
         loc.isActive = true;
-        // this.queueEvent(loc, new ZoneEvent(ZoneEventType.ENCLOSED, -1n, new LocAddChange(coord, loc.type, loc.shape, loc.angle)));
+        this.queueEvent(loc, new ZoneEvent(ZoneEventType.ENCLOSED, -1n, new LocAddChange(coord, loc.type, loc.shape, loc.angle)));
     }
 
     changeLoc(loc: Loc) {
@@ -236,7 +235,7 @@ export default class Zone {
         this.locs.addTail(loc);
 
         const coord: number = CoordGrid.packZoneCoord(loc.x, loc.z);
-        // this.queueEvent(loc, new ZoneEvent(ZoneEventType.ENCLOSED, -1n, new LocAddChange(coord, loc.type, loc.shape, loc.angle)));
+        this.queueEvent(loc, new ZoneEvent(ZoneEventType.ENCLOSED, -1n, new LocAddChange(coord, loc.type, loc.shape, loc.angle)));
     }
 
     removeLoc(loc: Loc): void {

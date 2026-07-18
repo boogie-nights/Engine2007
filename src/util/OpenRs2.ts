@@ -5,7 +5,6 @@ import axios from 'axios';
 import * as tar from 'tar';
 
 import Js5Index from '#/js5/Js5Index.ts';
-import { loadPackFile } from '#tools/util/ConfigPackHelper.ts';
 
 type OpenRs2Xtea = {
     archive: number;
@@ -206,27 +205,6 @@ export default class OpenRs2 {
                 continue;
             }
             index.packed[g] = Uint8Array.from(fs.readFileSync(packedPath));
-        }
-
-        return index;
-    }
-
-    async loadLocalGeneratedIndex(archive: number, groups: Record<number, string>): Promise<Js5Index> {
-        const index = new Js5Index(false, false);
-
-        for (const [groupStr, packFileName] of Object.entries(groups)) {
-            const group = Number(groupStr);
-            const packedPath = `data/pack/cache/${archive}/${group}.dat`;
-            if (!fs.existsSync(packedPath)) {
-                continue;
-            }
-
-            const fileCount = loadPackFile(packFileName).size;
-            if (fileCount === 0) {
-                continue;
-            }
-
-            index.registerLocalGroup(group, fileCount, Uint8Array.from(fs.readFileSync(packedPath)));
         }
 
         return index;

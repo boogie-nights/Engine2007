@@ -3,32 +3,11 @@ import path from 'path';
 import Packet from '#/io/Packet.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import {
-    CACHE_OUT_DIR,
-    assembleGroupBuffer,
-    packGroup,
     readConfigFile,
     writePackFile,
 } from '#tools/util/ConfigPackHelper.ts';
 
-const CONFIG_ARCHIVE = 2;
-const VARS_GROUP = 7;
-
-function encodeVars(debugName: string, typeChar: number | null): Uint8Array {
-    const buf = new Packet(new Uint8Array(64));
-
-    if (typeChar !== null) {
-        buf.p1(1);
-        buf.p1(typeChar);
-    }
-
-    if (debugName.length > 0) {
-        buf.p1(250);
-        buf.pjstr(debugName);
-    }
-
-    buf.p1(0);
-    return new Uint8Array(buf.data.subarray(0, buf.pos));
-}
+const OUT_DIR = path.join('data', 'pack', 'server');
 
 export function pack() {
     const configBlocks = readConfigFile('.vars');
@@ -40,7 +19,9 @@ export function pack() {
 
     const names = Array.from(configBlocks.keys()).sort();
 
-    const files: Uint8Array[] = new Array(names.length);
+    const buf = new Packet(new Uint8Array(1024 * 1024));
+    buf.p2(names.length);
+
     const packLines: string[] = [];
 
     for (let id = 0; id < names.length; id++) {
@@ -65,19 +46,25 @@ export function pack() {
             }
         }
 
-        files[id] = encodeVars(debugName, typeChar);
+        if (typeChar !== null) {
+            buf.p1(1);
+            buf.p1(typeChar);
+        }
+
+        if (debugName.length > 0) {
+            buf.p1(250);
+            buf.pjstr(debugName);
+        }
+
+        buf.p1(0);
+
         packLines.push(`${id}=${debugName}`);
     }
 
     writePackFile('vars.pack', packLines);
 
-    const outDir = path.join(CACHE_OUT_DIR, String(CONFIG_ARCHIVE));
-    if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
-
-    const groupBuffer = assembleGroupBuffer(files);
-    const container = packGroup(groupBuffer, null);
-
-    fs.writeFileSync(path.join(outDir, `${VARS_GROUP}.dat`), container);
+    if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
+    fs.writeFileSync(path.join(OUT_DIR, 'vars.dat'), buf.data.subarray(0, buf.pos));
 }
 
 pack();

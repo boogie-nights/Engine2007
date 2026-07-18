@@ -28,10 +28,20 @@ export default class LocType extends ConfigType {
     static load(index: Js5Index): void {
         const groupCount = index.capacity;
 
-        const maxId = ((groupCount - 1) << 8) | 255;
-        LocType.configs = new Array(maxId + 1);
+        let totalSlots = 0;
+        for (let g = 0; g < groupCount; g++) {
+            totalSlots += index.groupSize[g] ?? 0;
+        }
+
+        if (totalSlots === 0) {
+            LocType.count = 0;
+            return;
+        }
+
+        LocType.configs = new Array(totalSlots);
         LocType.configNames.clear();
 
+        let nextId = 0;
         let loadedCount = 0;
 
         for (let g = 0; g < groupCount; g++) {
@@ -48,12 +58,13 @@ export default class LocType extends ConfigType {
 
             for (let i = 0; i < groupSize; i++) {
                 const fileId = fileIds ? fileIds[i] : i;
+                const locId = nextId++;
+
                 const data = index.unpacked[g]?.[fileId];
                 if (!data) {
                     continue;
                 }
 
-                const locId = (g << 8) | fileId;
                 const type = new LocType(locId);
                 try {
                     type.decodeType(new Packet(data));

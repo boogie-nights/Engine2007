@@ -7,16 +7,12 @@ import { HuntNobodyNear } from '#/engine/entity/hunt/HuntNobodyNear.js';
 import { HuntVis } from '#/engine/entity/hunt/HuntVis.js';
 import { NpcMode } from '#/engine/entity/NpcMode.js';
 import {
-    CACHE_OUT_DIR,
-    assembleGroupBuffer,
-    packGroup,
     readConfigFile,
     writePackFile,
     loadNameToIdMap,
 } from '#tools/util/ConfigPackHelper.ts';
 
-const CONFIG_ARCHIVE = 2;
-const HUNT_GROUP = 9;
+const OUT_DIR = path.join('data', 'pack', 'server');
 
 type HuntOpcode = {
     code: number;
@@ -437,13 +433,19 @@ export function pack() {
 
     writePackFile('hunt.pack', packLines);
 
-    const outDir = path.join(CACHE_OUT_DIR, String(CONFIG_ARCHIVE));
-    if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+    if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 
-    const groupBuffer = assembleGroupBuffer(files);
-    const container = packGroup(groupBuffer, null);
+    const totalSize = files.reduce((s, f) => s + f.length, 0);
+    const out = new Uint8Array(2 + totalSize);
+    new DataView(out.buffer).setUint16(0, names.length, false);
 
-    fs.writeFileSync(path.join(outDir, `${HUNT_GROUP}.dat`), container);
+    let pos = 2;
+    for (const f of files) {
+        out.set(f, pos);
+        pos += f.length;
+    }
+
+    fs.writeFileSync(path.join(OUT_DIR, 'hunt.dat'), out);
 }
 
 pack();

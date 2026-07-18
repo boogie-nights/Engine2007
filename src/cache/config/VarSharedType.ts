@@ -1,14 +1,38 @@
+import fs from 'fs';
 import { ConfigType } from '#/cache/config/ConfigType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import Packet from '#/io/Packet.js';
-import Js5Index from '#/js5/Js5Index.js';
-
-const VARS_GROUP = 7;
 
 export default class VarSharedType extends ConfigType {
     static configNames: Map<string, number> = new Map();
     static configs: VarSharedType[] = [];
-    static count: number = 0;
+
+    static load(dir: string): void {
+        if (!fs.existsSync(`${dir}/server/vars.dat`)) {
+            return;
+        }
+
+        const dat = Packet.load(`${dir}/server/vars.dat`);
+        this.parse(dat);
+    }
+
+    static parse(dat: Packet): void {
+        VarSharedType.configNames = new Map();
+        VarSharedType.configs = [];
+
+        const count = dat.g2();
+
+        for (let id = 0; id < count; id++) {
+            const config = new VarSharedType(id);
+            config.decodeType(dat);
+
+            VarSharedType.configs[id] = config;
+
+            if (config.debugname) {
+                VarSharedType.configNames.set(config.debugname.toLowerCase(), id);
+            }
+        }
+    }
 
     static get(id: number): VarSharedType {
         return VarSharedType.configs[id];
@@ -26,45 +50,11 @@ export default class VarSharedType extends ConfigType {
         return this.get(id);
     }
 
-    static load(index: Js5Index): void {
-        const groupSize = index.groupSize[VARS_GROUP];
-        if (!groupSize) {
-            VarSharedType.count = 0;
-            return;
-        }
-
-        if (!index.packed[VARS_GROUP] || Object.keys(index.unpacked[VARS_GROUP] ?? {}).length === 0) {
-            if (!index.unpackGroup(VARS_GROUP)) {
-                VarSharedType.count = 0;
-                return;
-            }
-        }
-
-        VarSharedType.configs = new Array(groupSize);
-        VarSharedType.configNames.clear();
-
-        let loadedCount = 0;
-        const fileIds = index.fileIds[VARS_GROUP];
-
-        for (let i = 0; i < groupSize; i++) {
-            const fileId = fileIds ? fileIds[i] : i;
-            const data = index.unpacked[VARS_GROUP]?.[fileId];
-            if (!data) continue;
-
-            const type = new VarSharedType(fileId);
-            type.decodeType(new Packet(data));
-            type.postDecode();
-
-            VarSharedType.configs[fileId] = type;
-            loadedCount++;
-
-            if (type.debugname) {
-                VarSharedType.configNames.set(type.debugname.toLowerCase(), fileId);
-            }
-        }
-
-        VarSharedType.count = loadedCount;
+    static get count(): number {
+        return this.configs.length;
     }
+
+    // ----
 
     type: number = ScriptVarType.INT;
 

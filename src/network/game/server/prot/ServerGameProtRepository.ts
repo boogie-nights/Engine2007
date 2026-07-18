@@ -35,6 +35,14 @@ import IfOpenTop from '#/network/game/server/model/IfOpenTop.js';
 import IfOpenTopEncoder from '#/network/game/server/codec/IfOpenTopEncoder.js';
 import IfOpenSub from '#/network/game/server/model/IfOpenSub.js';
 import IfOpenSubEncoder from '#/network/game/server/codec/IfOpenSubEncoder.js';
+import LocAddChange from '#/network/game/server/model/LocAddChange.ts';
+import LocAddChangeEncoder from '#/network/game/server/codec/LocAddChangeEncoder.ts';
+import UpdateZoneFullFollows from '#/network/game/server/model/UpdateZoneFullFollows.ts';
+import UpdateZoneFullFollowsEncoder from '#/network/game/server/codec/UpdateZoneFullFollowsEncoder.ts';
+import UpdateZonePartialEnclosed from '#/network/game/server/model/UpdateZonePartialEnclosed.ts';
+import UpdateZonePartialEnclosedEncoder from '#/network/game/server/codec/UpdateZonePartialEnclosedEncoder.ts';
+import UpdateZonePartialFollows from '#/network/game/server/model/UpdateZonePartialFollows.ts';
+import UpdateZonePartialFollowsEncoder from '#/network/game/server/codec/UpdateZonePartialFollowsEncoder.ts';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type GenericOutgoingMessage<T extends ServerGameMessage> = new (...args: any[]) => T;
@@ -74,6 +82,10 @@ class ServerGameProtRepository {
         this.bind(UpdateStat, new UpdateStatEncoder());
         this.bind(IfOpenTop, new IfOpenTopEncoder());
         this.bind(IfOpenSub, new IfOpenSubEncoder());
+        this.bind(LocAddChange, new LocAddChangeEncoder());
+        this.bind(UpdateZoneFullFollows, new UpdateZoneFullFollowsEncoder());
+        this.bind(UpdateZonePartialEnclosed, new UpdateZonePartialEnclosedEncoder());
+        this.bind(UpdateZonePartialFollows, new UpdateZonePartialFollowsEncoder());
     }
 }
 
