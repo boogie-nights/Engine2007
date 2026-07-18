@@ -304,6 +304,22 @@ export default class Packet {
         this.#view.setUint8(this.pos - size - 1, size);
     }
 
+    pMidiVarLen(arg0: number): void {
+        if ((arg0 & 0xffffff80) !== 0) {
+            if ((arg0 & 0xffffc000) !== 0) {
+                if ((arg0 & 0xffe00000) !== 0) {
+                    if ((arg0 & 0xf0000000) !== 0) {
+                        this.p1((arg0 >>> 28) | 0x80);
+                    }
+                    this.p1((arg0 >>> 21) | 0x80);
+                }
+                this.p1((arg0 >>> 14) | 0x80);
+            }
+            this.p1((arg0 >>> 7) | 0x80);
+        }
+        this.p1(arg0 & 0x7f);
+    }
+
     // ----
 
     g1(): number {
@@ -475,6 +491,16 @@ export default class Packet {
             var1 += 32767;
         }
         return var1 + var2;
+    }
+
+    gMidiVarLen(): number {
+        let var1 = this.data[this.pos++];
+        let var2 = 0;
+        while ((var1 << 24) >> 24 < 0) {
+            var2 = (var2 | (var1 & 0x7f)) << 7;
+            var1 = this.data[this.pos++];
+        }
+        return var2 | var1;
     }
 
     bits(): void {
