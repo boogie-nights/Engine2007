@@ -41,6 +41,8 @@ import { pack as packStruct} from './config/StructConfig.ts';
 import { pack as packCategory } from './config/Category.ts';
 import { pack as packMesAnim } from './config/MesAnimConfig.ts';
 import { pack as packSpot } from './config/SpotConfig.ts';
+import { pack as packDbrow } from './config/DbRowConfig.ts';
+import { pack as packDbTable } from './config/DbTableConfig.ts';
 
 export async function packAll(modelFlags: number[]) {
     if (parentPort) {
@@ -75,6 +77,8 @@ export async function packAll(modelFlags: number[]) {
     await packCategory();
     await packMesAnim();
     await packSpot();
+    await packDbTable();
+    await packDbrow();
     
     // revalidatePack();
 

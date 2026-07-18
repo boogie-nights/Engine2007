@@ -1,4 +1,4 @@
-// import DbTableType from '#/cache/config/DbTableType.js';
+import DbTableType from '#/cache/config/DbTableType.js';
 import Entity from '#/engine/entity/Entity.js';
 import Loc from '#/engine/entity/Loc.js';
 import Npc from '#/engine/entity/Npc.js';
@@ -111,7 +111,7 @@ export default class ScriptState {
     /**
      * Used for db operations with db_find and related commands
      */
-    // dbTable: DbTableType | null = null;
+    dbTable: DbTableType | null = null;
     dbColumn: number = -1;
     dbRow: number = -1;
     dbRowQuery: number[] = [];

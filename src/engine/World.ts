@@ -10,8 +10,8 @@ import kleur from 'kleur';
 // lostcity
 import CategoryType from '#/cache/config/CategoryType.js';
 import Component from '#/cache/config/Component.js';
-// import DbRowType from '#/cache/config/DbRowType.js';
-// import DbTableType from '#/cache/config/DbTableType.js';
+import DbRowType from '#/cache/config/DbRowType.js';
+import DbTableType from '#/cache/config/DbTableType.js';
 import EnumType from '#/cache/config/EnumType.js';
 // import FontType from '#/cache/config/FontType.js';
 import HuntType from '#/cache/config/HuntType.js';
@@ -97,7 +97,7 @@ import { WalkTriggerSetting } from '#/engine/entity/WalkTriggerSetting.js';
 import Js5 from './Js5.js';
 import { ObjDelayedRequest } from './entity/ObjDelayedRequest.js';
 import VarBitType from '#/cache/config/VarBitType.js';
-// import DbTableIndex from '#/cache/config/DbTableIndex.js';
+import DbTableIndex from '#/cache/config/DbTableIndex.js';
 // import FriendlistLoaded from '#/network/game/server/model/FriendlistLoaded.js';
 // import { WorldList, WorldListBuf } from '#/util/WorldList.js';
 import OpenRs2 from '#/util/OpenRs2.ts';
@@ -257,9 +257,9 @@ class World {
             }
         }
 
-        // DbTableType.load('data/pack');
-        // DbRowType.load('data/pack');
-        // DbTableIndex.init();
+        DbTableType.load('data/pack');
+        DbRowType.load('data/pack');
+        DbTableIndex.init();
 
         if (this.vars.length !== VarSharedType.count) {
             const old = this.vars;
@@ -284,8 +284,6 @@ class World {
                 }
             }
         }
-
-        // Component.load('data/pack');
 
         const count = ScriptProvider.load('data/pack');
         if (Environment.NODE_DEBUG) {

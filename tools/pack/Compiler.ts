@@ -3,7 +3,7 @@ import fs from 'fs';
 import { CompileServerScript } from '@lostcityrs/runescript';
 
 import Component from '#/cache/config/Component.js';
-// import DbTableType from '#/cache/config/DbTableType.js';
+import DbTableType from '#/cache/config/DbTableType.js';
 import InvType from '#/cache/config/InvType.js';
 import ParamType from '#/cache/config/ParamType.js';
 import ScriptVarType from '#/cache/config/ScriptVarType.js';
@@ -281,29 +281,29 @@ export async function runServerCompiler() {
         paramInfo.vartype[id] = param.getType();
     }
 
-    // DbTableType.load('data/pack');
-    // for (let id = 0; id <= dbtableInfo.max; id++) {
-    //     if (typeof dbtableInfo.map[id] === 'undefined') {
-    //         continue;
-    //     }
+    DbTableType.load('data/pack');
+    for (let id = 0; id <= dbtableInfo.max; id++) {
+        if (typeof dbtableInfo.map[id] === 'undefined') {
+            continue;
+        }
 
-    //     const table = DbTableType.get(id);
-    //     for (let column = 0; column < table.columnNames.length; column++) {
-    //         const types = table.types[column].map((t: number) => ScriptVarType.getType(t));
+        const table = DbTableType.get(id);
+        for (let column = 0; column < table.columnNames.length; column++) {
+            const types = table.types[column].map((t: number) => ScriptVarType.getType(t));
 
-    //         const columnIndex = ((table.id & 0xffff) << 12) | ((column & 0x7f) << 4);
-    //         dbcolumnInfo.add(columnIndex, `${table.debugname}:${table.columnNames[column]}`, false);
-    //         dbcolumnInfo.vartype[columnIndex] = types.join(',');
+            const columnIndex = ((table.id & 0xffff) << 12) | ((column & 0x7f) << 4);
+            dbcolumnInfo.add(columnIndex, `${table.debugname}:${table.columnNames[column]}`, false);
+            dbcolumnInfo.vartype[columnIndex] = types.join(',');
 
-    //         if (types.length > 1) {
-    //             for (let tuple = 0; tuple < types.length; tuple++) {
-    //                 const tupleIndex = ((table.id & 0xffff) << 12) | ((column & 0x7f) << 4) | ((tuple + 1) & 0xf);
-    //                 dbcolumnInfo.add(tupleIndex, `${table.debugname}:${table.columnNames[column]}:${tuple}`, false);
-    //                 dbcolumnInfo.vartype[tupleIndex] = types[tuple];
-    //             }
-    //         }
-    //     }
-    // }
+            if (types.length > 1) {
+                for (let tuple = 0; tuple < types.length; tuple++) {
+                    const tupleIndex = ((table.id & 0xffff) << 12) | ((column & 0x7f) << 4) | ((tuple + 1) & 0xf);
+                    dbcolumnInfo.add(tupleIndex, `${table.debugname}:${table.columnNames[column]}:${tuple}`, false);
+                    dbcolumnInfo.vartype[tupleIndex] = types[tuple];
+                }
+            }
+        }
+    }
 
     // prepare meta mapping files
     const statInfo = CompilerTypeInfo.loadMap(PlayerStatMap, true);
