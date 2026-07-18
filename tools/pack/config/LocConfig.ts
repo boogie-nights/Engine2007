@@ -86,6 +86,7 @@ function parseLocOps(
         varp: Map<string, number>;
         loc: Map<string, number>;
         category: Map<string, number>;
+        param: Map<string, number>;
     }
 ): LocOpcode[] {
     const ops: LocOpcode[] = [];
@@ -246,7 +247,7 @@ function parseLocOps(
             const secondComma = rest.indexOf(',');
             const typeToken = rest.slice(0, secondComma);
             const value = rest.slice(secondComma + 1);
-            const id = parseInt(idStr, 10);
+            const id = resolveByMap(idStr, maps.param, 'param');
             const isString = typeToken === 's';
             const b = bag('params', occ);
             b.list = b.list ?? [];
@@ -679,6 +680,7 @@ export function pack() {
         varp: loadNameToIdMap('varp.pack'),
         loc: loadNameToIdMap('loc.pack'),
         category: loadNameToIdMap('category.pack'),
+        param: loadNameToIdMap('param.pack'),
     };
 
     const locLocations = loadLocLocations();

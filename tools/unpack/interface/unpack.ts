@@ -33,6 +33,24 @@ const TARGET_MASK_NAMES: Record<number, string> = {
     0x20: 'component'
 };
 
+const FONT_NAMES: Record<number, string> = {
+    305: 'friendslist_font',
+    307: 'tutorial_font',
+    492: 'glyphs',
+    494: 'p11_full',
+    495: 'p12_full',
+    496: 'b12_full',
+    497: 'q8_full',
+    584: 'tutorial_font_big',
+    645: 'quill_oblique_large',
+    646: 'quill_caps_large',
+    647: 'lunar_alphabet',
+    648: 'lunar_alphabet_lrg',
+    764: 'barbassault_font',
+    776: 'tzhaar_numbers',
+    819: 'surok_font'
+};
+
 export class IfType {
     parentId: number = -1;
     v3: boolean = false;
@@ -978,7 +996,7 @@ function serializeComponent(
             push('vAlign', enumName(VERTICAL_ALIGNMENT_NAMES, c.vAlign));
         }
         if (c.lineHeight !== 0) push('lineHeight', c.lineHeight);
-        if (c.font !== -1) push('font', c.font);
+        if (c.font !== -1) push('font', FONT_NAMES[c.font] ?? c.font);
         if (c.shadow) push('shadow', 'yes');
     }
     

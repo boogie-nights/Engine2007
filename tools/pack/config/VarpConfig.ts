@@ -6,7 +6,6 @@ import ScriptVarType from '#/cache/config/ScriptVarType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.js';
 import {
     CACHE_OUT_DIR,
-    CONFIG_DIR,
     loadNameToIdMap,
     readConfigFile,
     packGroupAuto,

@@ -114,6 +114,7 @@ function buildOp(
         npc: Map<string, number>;
         category: Map<string, number>;
         hunt: Map<string, number>;
+        param: Map<string, number>;
     }
 ): NpcOpcode | null {
     switch (family) {
@@ -317,6 +318,7 @@ function parseNpcOps(
         npc: Map<string, number>;
         category: Map<string, number>;
         hunt: Map<string, number>;
+        param: Map<string, number>;
     }
 ): NpcOpcode[] {
     const ops: NpcOpcode[] = [];
@@ -463,7 +465,7 @@ function parseNpcOps(
             const value = rest.slice(secondComma + 1);
             const g = enter('params', occ);
             g.list = g.list ?? [];
-            g.list.push({ id: parseInt(val.slice(0, firstComma), 10), isString: typeToken === 's', value });
+            g.list.push({ id: resolveByMap(val.slice(0, firstComma), maps.param, 'param'), isString: typeToken === 's', value });
         } else if (key === 'attack') {
             enter('attack', occ).value = parseInt(val, 10);
         } else if (key === 'defence') {
@@ -725,6 +727,7 @@ export function pack() {
         npc: loadNameToIdMap('npc.pack'),
         category: loadNameToIdMap('category.pack'),
         hunt: loadNameToIdMap('hunt.pack'),
+        param: loadNameToIdMap('param.pack'),
     };
 
     const npcLocations = loadNpcLocations();

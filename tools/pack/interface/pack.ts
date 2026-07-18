@@ -40,6 +40,24 @@ const MODEL_TYPE_NAMES: Record<number, string> = {
     0: 'None', 1: 'Model', 2: 'NPC_Head', 3: 'Player_Head', 4: 'Item', 5: 'Player_Model', 6: 'NPC_Model'
 };
 
+const FONT_NAMES: Record<number, string> = {
+    305: 'friendslist_font',
+    307: 'tutorial_font',
+    492: 'glyphs',
+    494: 'p11_full',
+    495: 'p12_full',
+    496: 'b12_full',
+    497: 'q8_full',
+    584: 'tutorial_font_big',
+    645: 'quill_oblique_large',
+    646: 'quill_caps_large',
+    647: 'lunar_alphabet',
+    648: 'lunar_alphabet_lrg',
+    764: 'barbassault_font',
+    776: 'tzhaar_numbers',
+    819: 'surok_font'
+};
+
 const COMPONENT_TYPE_IDS = invert(COMPONENT_TYPE_NAMES);
 const BUTTON_TYPE_IDS = invert(BUTTON_TYPE_NAMES);
 const SIZE_ALIGNMENT_IDS = invert(SIZE_ALIGNMENT_NAMES);
@@ -47,6 +65,7 @@ const POSITION_ALIGNMENT_IDS = invert(POSITION_ALIGNMENT_NAMES);
 const HORIZONTAL_ALIGNMENT_IDS = invert(HORIZONTAL_ALIGNMENT_NAMES);
 const VERTICAL_ALIGNMENT_IDS = invert(VERTICAL_ALIGNMENT_NAMES);
 const MODEL_TYPE_IDS = invert(MODEL_TYPE_NAMES);
+const FONT_IDS = invert(FONT_NAMES);
 
 const HOOK_INT_LITERALS: Record<number, string> = {
     [-2147483647]: 'mouseX', [-2147483646]: 'mouseY', [-2147483645]: 'component.parentId',
@@ -332,7 +351,7 @@ function parseComponentBlock(shortName: string, lines: string[]): ParsedComponen
         else if (key === 'hAlign') c.hAlign = HORIZONTAL_ALIGNMENT_IDS[val] ?? parseInt(val, 10);
         else if (key === 'vAlign') c.vAlign = VERTICAL_ALIGNMENT_IDS[val] ?? parseInt(val, 10);
         else if (key === 'lineHeight') c.lineHeight = parseInt(val, 10);
-        else if (key === 'font') c.font = parseInt(val, 10);
+        else if (key === 'font') c.font = FONT_IDS[val] ?? parseInt(val, 10);
         else if (key === 'shadow') c.shadow = val === 'yes';
         else if (key === 'text') c.text = unquote(val);
         else if (key === 'text2') c.text2 = unquote(val);

@@ -618,7 +618,7 @@ export function pack() {
 
     const files = findConfigFiles('.obj');
     if (files.size === 0) {
-        console.error('No .obj entries found under BUILD_SRC_DIR/scripts');
+        console.error('No .obj entries found.');
         return;
     }
 
