@@ -46,6 +46,7 @@ function unpack() {
         const varbitPack = loadPackFile('varbit.pack');
         const varpPack = loadPackFile('varp.pack');
         const categoryPack = loadPackFile('category.pack');
+        const modelPack = loadPackFile('model.pack');
 
         const resolvedNames = new Map<number, string>();
         const configBlocks: string[] = [];
@@ -55,6 +56,7 @@ function unpack() {
         const getVarbitName = (id: number) => varbitPack.get(id) ?? `varbit_${id}`;
         const getVarpName = (id: number) => varpPack.get(id) ?? `varp_${id}`;
         const getCategoryName = (id: number) => categoryPack.get(id) ?? `category_${id}`;
+        const getModelName = (id: number) => modelPack.get(id) ?? `model_${id}`;
 
         const resolveColor = (hsl: number): string => {
             const possible = ColorConversion.reverseHsl(hsl);
@@ -141,7 +143,7 @@ function unpack() {
                             const model = buf.g2();
                             const shape = buf.g1();
                             modelIndex++;
-                            def.push(`model${modelIndex}${sfx}=model_${model},${shape}`);
+                            def.push(`model${modelIndex}${sfx}=${getModelName(model)},${shape}`);
                         }
                     } else if (opcode === 2) {
                         const sfx = suf('name');
@@ -155,7 +157,7 @@ function unpack() {
                         for (let j = 0; j < count; j++) {
                             const model = buf.g2();
                             modelIndex++;
-                            def.push(`model${modelIndex}${sfx}=model_${model},default`);
+                            def.push(`model${modelIndex}${sfx}=${getModelName(model)},default`);
                         }
                     } else if (opcode === 14) {
                         const sfx = suf('width');

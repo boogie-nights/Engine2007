@@ -297,7 +297,7 @@ function parseComponentBlock(shortName: string, lines: string[]): ParsedComponen
         hAlign: 0, vAlign: 0, lineHeight: 0, font: -1, shadow: false,
         text: '', text2: '',
         graphic: -1, graphic2: -1, rotate: 0, tiling: false, field3477: false, outline: 0, shadowColour: 0, vFlip: false, hFlip: false,
-        model1Type: 1, model1Id: -1, model2Type: 1, model2Id: -1, modelAnim: -1, modelAnim2: -1,
+        model1Type: 1, model1Id: -1, model2Type: 1, model2Id: -1, model1IdName: undefined, model2IdName: undefined, modelAnim: -1, modelAnim2: -1,
         modelZoom: 100, modelXAn: 0, modelYAn: 0, modelZAn: 0, modelXOf: 0, modelYOf: 0,
         orthog: false, modelBaseWidth: 0, modelBaseHeight: 0,
         discardedField1: null, discardedField2: null, discardedModelField: null,
@@ -365,9 +365,9 @@ function parseComponentBlock(shortName: string, lines: string[]): ParsedComponen
         else if (key === 'vFlip') c.vFlip = val === 'yes';
         else if (key === 'hFlip') c.hFlip = val === 'yes';
         else if (key === 'model1Type') c.model1Type = MODEL_TYPE_IDS[val] ?? parseInt(val, 10);
-        else if (key === 'model1Id') c.model1Id = parseInt(val, 10);
+        else if (key === 'model1Id') c.model1IdName = val;
         else if (key === 'model2Type') c.model2Type = MODEL_TYPE_IDS[val] ?? parseInt(val, 10);
-        else if (key === 'model2Id') c.model2Id = parseInt(val, 10);
+        else if (key === 'model2Id') c.model2IdName = val;
         else if (key === 'modelAnim') c.modelAnimName = val;
         else if (key === 'modelAnim2') c.modelAnim2Name = val;
         else if (key === 'modelZoom') c.modelZoom = parseInt(val, 10);
@@ -520,6 +520,7 @@ interface EncodeCtx {
     objNameToId: Map<string, number>;
     varbitNameToId: Map<string, number>;
     varpNameToId: Map<string, number>;
+    modelNameToId: Map<string, number>;
     componentNameToLoc: Map<string, { group: number; file: number }>;
 }
 
@@ -530,6 +531,15 @@ function resolveSeq(name: string, seqNameToId: Map<string, number>): number {
     const num = parseInt(name, 10);
     if (!isNaN(num)) return num;
     return seqNameToId.get(name) ?? -1;
+}
+
+function resolveModel(name: string, modelNameToId: Map<string, number>): number {
+    if (name === '-1') return -1;
+    const m = name.match(/^model_(\d+)$/);
+    if (m) return parseInt(m[1], 10);
+    const num = parseInt(name, 10);
+    if (!isNaN(num)) return num;
+    return modelNameToId.get(name) ?? -1;
 }
 
 function encodeConditions(c: ParsedComponent, ctx: EncodeCtx): { comparator: number[]; operand: number[]; scripts: Int32Array[] } {
@@ -631,7 +641,7 @@ function encodeComponent3(c: ParsedComponent, ctx: EncodeCtx): Uint8Array {
         buf.p1(c.hFlip ? 1 : 0);
     }
     if (c.type === 6) {
-        buf.p2(c.model1Id === -1 ? 65535 : c.model1Id);
+        buf.p2(c.model1IdName !== undefined ? (resolveModel(c.model1IdName, ctx.modelNameToId) === -1 ? 65535 : resolveModel(c.model1IdName, ctx.modelNameToId)) : 65535);
         buf.p2(c.modelXOf);
         buf.p2(c.modelYOf);
         buf.p2(c.modelXAn);
@@ -807,8 +817,8 @@ function encodeComponentOld(c: ParsedComponent, ctx: EncodeCtx): Uint8Array {
         buf.p4(c.graphic2);
     }
     if (c.type === 6) {
-        buf.p2(c.model1Id === -1 ? 65535 : c.model1Id);
-        buf.p2(c.model2Id === -1 ? 65535 : c.model2Id);
+        buf.p2(c.model1IdName !== undefined ? (resolveModel(c.model1IdName, ctx.modelNameToId) === -1 ? 65535 : resolveModel(c.model1IdName, ctx.modelNameToId)) : 65535);
+        buf.p2(c.model2IdName !== undefined ? (resolveModel(c.model2IdName, ctx.modelNameToId) === -1 ? 65535 : resolveModel(c.model2IdName, ctx.modelNameToId)) : 65535);
         buf.p2(c.modelAnimName !== undefined ? (resolveSeq(c.modelAnimName, ctx.seqNameToId) === -1 ? 65535 : resolveSeq(c.modelAnimName, ctx.seqNameToId)) : 65535);
         buf.p2(c.modelAnim2Name !== undefined ? (resolveSeq(c.modelAnim2Name, ctx.seqNameToId) === -1 ? 65535 : resolveSeq(c.modelAnim2Name, ctx.seqNameToId)) : 65535);
         buf.p2(c.modelZoom);
@@ -892,6 +902,7 @@ export function pack() {
     }
 
     const seqNameToId = loadNameToIdMap('seq.pack');
+    const modelNameToId = loadNameToIdMap('model.pack');
     const objNameToId = loadNameToIdMap('obj.pack');
     const varbitNameToId = loadNameToIdMap('varbit.pack');
     const varpNameToId = loadNameToIdMap('varp.pack');
@@ -971,7 +982,7 @@ export function pack() {
             const parsed = parseComponentBlock(shortName, lines);
             const ctx: EncodeCtx = {
                 parentId: compId + (groupId << 16),
-                seqNameToId, objNameToId, varbitNameToId, varpNameToId,
+                seqNameToId, objNameToId, varbitNameToId, varpNameToId, modelNameToId,
                 componentNameToLoc: componentFullNameToLoc,
             };
 

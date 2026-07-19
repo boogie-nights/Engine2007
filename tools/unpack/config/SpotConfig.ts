@@ -21,8 +21,11 @@ function unpack() {
     const spotanimNames = loadPackFile('spotanim-names.pack');
     const seqNames = loadPackFile('seq.pack');
     const texturePack = loadPackFile('texture.pack');
+    const modelPack = loadPackFile('model.pack');
 
     const getTextureName = (id: number): string => texturePack.get(id) ?? `texture_${id}`;
+
+    const getModelName = (id: number): string => modelPack.get(id) ?? `model_${id}`;
 
     const getSeqName = (id: number): string => {
         if (id === -1 || id === 65535) return 'null';
@@ -113,7 +116,7 @@ function unpack() {
                     if (opcode === 0) break;
 
                     if (opcode === 1) {
-                        def.push(`model=model_${buf.g2()}`);
+                        def.push(`model=${getModelName(buf.g2())}`);
                     } else if (opcode === 2) {
                         def.push(`anim=${getSeqName(buf.g2())}`);
                     } else if (opcode === 4) {

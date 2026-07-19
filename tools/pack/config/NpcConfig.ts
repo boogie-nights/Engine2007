@@ -115,6 +115,7 @@ function buildOp(
         category: Map<string, number>;
         hunt: Map<string, number>;
         param: Map<string, number>;
+        model: Map<string, number>;
     }
 ): NpcOpcode | null {
     switch (family) {
@@ -319,6 +320,7 @@ function parseNpcOps(
         category: Map<string, number>;
         hunt: Map<string, number>;
         param: Map<string, number>;
+        model: Map<string, number>;
     }
 ): NpcOpcode[] {
     const ops: NpcOpcode[] = [];
@@ -356,7 +358,7 @@ function parseNpcOps(
         if ((m = key.match(/^model(\d+)$/))) {
             const g = enter('models', occ);
             g.list = g.list ?? [];
-            g.list.push(resolveNumeric(val, 'model'));
+            g.list.push(resolveByMap(val, maps.model, 'model'));
         } else if (key === 'name') {
             enter('name', occ).value = rawVal;
         } else if (key === 'desc') {
@@ -409,7 +411,7 @@ function parseNpcOps(
         } else if ((m = key.match(/^head(\d+)$/))) {
             const g = enter('heads', occ);
             g.list = g.list ?? [];
-            g.list.push(resolveNumeric(val, 'model'));
+            g.list.push(resolveByMap(val, maps.model, 'model'));
         } else if (key === 'minimap') {
             enter('minimap', occ).no = val === 'no';
         } else if (key === 'vislevel') {
@@ -728,6 +730,7 @@ export function pack() {
         category: loadNameToIdMap('category.pack'),
         hunt: loadNameToIdMap('hunt.pack'),
         param: loadNameToIdMap('param.pack'),
+        model: loadNameToIdMap('model.pack'),
     };
 
     const npcLocations = loadNpcLocations();

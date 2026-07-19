@@ -37,12 +37,17 @@ function unpack() {
 
         const objPack = loadPackFile('obj.pack');
         const texturePack = loadPackFile('texture.pack');
+        const modelPack = loadPackFile('model.pack');
 
         const resolvedNames = new Map<number, string>();
         const configBlocks: string[] = [];
 
         const getTextureName = (id: number) => {
             return texturePack.get(id) ?? `texture_${id}`;
+        };
+
+        const getModelName = (id: number) => {
+            return modelPack.get(id) ?? `model_${id}`;
         };
 
         const resolveColor = (hsl: number): number => {
@@ -164,7 +169,7 @@ function unpack() {
                     if (opcode === 0) break;
 
                     if (opcode === 1) {
-                        def.push(`model=model_${buf.g2()}`);
+                        def.push(`model=${getModelName(buf.g2())}`);
                     } else if (opcode === 2) {
                         def.push(`name=${buf.gjstr()}`);
                     } else if (opcode === 4) {
@@ -188,13 +193,13 @@ function unpack() {
                     } else if (opcode === 16) {
                         def.push('members=yes');
                     } else if (opcode === 23) {
-                        def.push(`manwear=model_${buf.g2()},${buf.g1()}`);
+                        def.push(`manwear=${getModelName(buf.g2())},${buf.g1()}`);
                     } else if (opcode === 24) {
-                        def.push(`manwear2=model_${buf.g2()}`);
+                        def.push(`manwear2=${getModelName(buf.g2())}`);
                     } else if (opcode === 25) {
-                        def.push(`womanwear=model_${buf.g2()},${buf.g1()}`);
+                        def.push(`womanwear=${getModelName(buf.g2())},${buf.g1()}`);
                     } else if (opcode === 26) {
-                        def.push(`womanwear2=model_${buf.g2()}`);
+                        def.push(`womanwear2=${getModelName(buf.g2())}`);
                     } else if (opcode >= 30 && opcode < 35) {
                         const index = opcode - 30 + 1;
                         def.push(`op${index}=${buf.gjstr()}`);
@@ -225,17 +230,17 @@ function unpack() {
                     } else if (opcode === 65) {
                         def.push('stockmarket=yes');
                     } else if (opcode === 78) {
-                        def.push(`manwear3=model_${buf.g2()}`);
+                        def.push(`manwear3=${getModelName(buf.g2())}`);
                     } else if (opcode === 79) {
-                        def.push(`womanwear3=model_${buf.g2()}`);
+                        def.push(`womanwear3=${getModelName(buf.g2())}`);
                     } else if (opcode === 90) {
-                        def.push(`manhead=model_${buf.g2()}`);
+                        def.push(`manhead=${getModelName(buf.g2())}`);
                     } else if (opcode === 91) {
-                        def.push(`womanhead=model_${buf.g2()}`);
+                        def.push(`womanhead=${getModelName(buf.g2())}`);
                     } else if (opcode === 92) {
-                        def.push(`manhead2=model_${buf.g2()}`);
+                        def.push(`manhead2=${getModelName(buf.g2())}`);
                     } else if (opcode === 93) {
-                        def.push(`womanhead2=model_${buf.g2()}`);
+                        def.push(`womanhead2=${getModelName(buf.g2())}`);
                     } else if (opcode === 95) {
                         def.push(`2dzan=${buf.g2()}`);
                     } else if (opcode === 96) {

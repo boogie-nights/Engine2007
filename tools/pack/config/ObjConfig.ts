@@ -94,6 +94,16 @@ function resolveObjRef(value: string, nameToId: Map<string, number>): number {
 
     return parseInt2(trimmed, 'obj ref');
 }
+
+function resolveModelRef(value: string, modelNameToId: Map<string, number>): number {
+    const trimmed = value.trim();
+
+    const fromMap = modelNameToId.get(trimmed);
+    if (fromMap !== undefined) return fromMap;
+
+    return parseInt2(trimmed, 'model ref');
+}
+
 function resolveNumeric(val: string, prefix: string): number {
     const m = val.match(new RegExp(`^${prefix}_(\\d+)$`));
     if (m) return parseInt(m[1], 10);
@@ -119,7 +129,8 @@ export function parseSourceObjs(
     content: string,
     nameToId: Map<string, number>,
     paramNameToId: Map<string, number>,
-    categoryNameToId: Map<string, number>
+    categoryNameToId: Map<string, number>,
+    modelNameToId: Map<string, number>
 ): Map<number, ObjOpcode[]> {
     const sections = parseObjSourceSections(content);
     const byId = new Map<number, ObjOpcode[]>();
@@ -155,7 +166,7 @@ export function parseSourceObjs(
             }
 
             if (key === 'model') {
-                ops.push({ code: 1, payload: parseInt2(vt, key) });
+                ops.push({ code: 1, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
@@ -239,27 +250,27 @@ export function parseSourceObjs(
 
             if (key === 'manwear') {
                 const comma = vt.indexOf(',');
-                const model = parseInt2(comma === -1 ? vt : vt.slice(0, comma), key);
+                const model = resolveModelRef(comma === -1 ? vt : vt.slice(0, comma), modelNameToId);
                 const offset = comma === -1 ? 0 : parseInt2(vt.slice(comma + 1), key + '.offset');
                 ops.push({ code: 23, payload: { model, offset } });
                 continue;
             }
 
             if (key === 'manwear2') {
-                ops.push({ code: 24, payload: parseInt2(vt, key) });
+                ops.push({ code: 24, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
             if (key === 'womanwear') {
                 const comma = vt.indexOf(',');
-                const model = parseInt2(comma === -1 ? vt : vt.slice(0, comma), key);
+                const model = resolveModelRef(comma === -1 ? vt : vt.slice(0, comma), modelNameToId);
                 const offset = comma === -1 ? 0 : parseInt2(vt.slice(comma + 1), key + '.offset');
                 ops.push({ code: 25, payload: { model, offset } });
                 continue;
             }
 
             if (key === 'womanwear2') {
-                ops.push({ code: 26, payload: parseInt2(vt, key) });
+                ops.push({ code: 26, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
@@ -336,32 +347,32 @@ export function parseSourceObjs(
             }
 
             if (key === 'manwear3') {
-                ops.push({ code: 78, payload: parseInt2(vt, key) });
+                ops.push({ code: 78, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
             if (key === 'womanwear3') {
-                ops.push({ code: 79, payload: parseInt2(vt, key) });
+                ops.push({ code: 79, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
             if (key === 'manhead') {
-                ops.push({ code: 90, payload: parseInt2(vt, key) });
+                ops.push({ code: 90, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
             if (key === 'womanhead') {
-                ops.push({ code: 91, payload: parseInt2(vt, key) });
+                ops.push({ code: 91, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
             if (key === 'manhead2') {
-                ops.push({ code: 92, payload: parseInt2(vt, key) });
+                ops.push({ code: 92, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
             if (key === 'womanhead2') {
-                ops.push({ code: 93, payload: parseInt2(vt, key) });
+                ops.push({ code: 93, payload: resolveModelRef(vt, modelNameToId) });
                 continue;
             }
 
@@ -615,6 +626,7 @@ export function pack() {
     const objNameToId    = loadNameToIdMap('obj.pack');
     const paramNameToId  = loadNameToIdMap('param.pack');
     const categoryNameToId = loadNameToIdMap('category.pack');
+    const modelNameToId = loadNameToIdMap('model.pack');
 
     const files = findConfigFiles('.obj');
     if (files.size === 0) {
@@ -626,7 +638,7 @@ export function pack() {
 
     for (const file of files) {
         const sourceContent = fs.readFileSync(file, 'utf-8');
-        const fileOpsById = parseSourceObjs(sourceContent, objNameToId, paramNameToId, categoryNameToId);
+        const fileOpsById = parseSourceObjs(sourceContent, objNameToId, paramNameToId, categoryNameToId, modelNameToId);
 
         for (const [id, ops] of fileOpsById) {
             if (objOpsById.has(id)) {

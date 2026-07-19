@@ -45,11 +45,13 @@ function unpack() {
         const seqPack = loadPackFile('seq.pack');
         const varbitPack = loadPackFile('varbit.pack');
         const varpPack = loadPackFile('varp.pack');
+        const modelPack = loadPackFile('model.pack');
 
         const getSeqName = (id: number) => seqPack.get(id) ?? `seq_${id}`;
         const getVarbitName = (id: number) => varbitPack.get(id) ?? `varbit_${id}`;
         const getVarpName = (id: number) => varpPack.get(id) ?? `varp_${id}`;
         const getTextureName = (id: number) => texturePack.get(id) ?? `texture_${id}`;
+        const getModelName = (id: number) => modelPack.get(id) ?? `model_${id}`;
 
         const resolveColor = (hsl: number): string => {
             const possible = ColorConversion.reverseHsl(hsl);
@@ -133,7 +135,7 @@ function unpack() {
                         for (let j = 0; j < count; j++) {
                             const model = buf.g2();
                             modelIndex++;
-                            def.push(`model${modelIndex}${sfx}=model_${model}`);
+                            def.push(`model${modelIndex}${sfx}=${getModelName(model)}`);
                         }
                     } else if (opcode === 2) {
                         const sfx = suf('name');
@@ -200,7 +202,7 @@ function unpack() {
                         for (let j = 0; j < count; j++) {
                             const model = buf.g2();
                             headIndex++;
-                            def.push(`head${headIndex}${sfx}=model_${model}`);
+                            def.push(`head${headIndex}${sfx}=${getModelName(model)}`);
                         }
                     } else if (opcode === 93) {
                         const sfx = suf('minimap');

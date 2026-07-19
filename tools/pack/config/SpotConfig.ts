@@ -67,7 +67,7 @@ function resolveRecolValue(val: string): number {
 function parseSpotanimFields(
     name: string,
     lines: string[],
-    maps: { seq: Map<string, number>; texture: Map<string, number> }
+    maps: { seq: Map<string, number>; texture: Map<string, number>; model: Map<string, number> }
 ): SpotanimOpcode[] {
     const ops: SpotanimOpcode[] = [];
 
@@ -86,7 +86,7 @@ function parseSpotanimFields(
         let m: RegExpMatchArray | null;
 
         if (rawKey === 'model') {
-            ops.push({ code: 1, payload: resolveNumeric(val, 'model') });
+            ops.push({ code: 1, payload: resolveByMap(val, maps.model, 'model') });
         } else if (rawKey === 'anim') {
             if (val !== 'null') {
                 ops.push({ code: 2, payload: resolveByMap(val, maps.seq, 'seq') });
@@ -162,6 +162,7 @@ function encodeSpotanim(ops: SpotanimOpcode[], debugName?: string): Uint8Array {
         } else if (code === 7 || code === 8) {
             buf.p1(payload);
         } else if (code === 9) {
+            // no payload
         } else if (code === 40 || code === 41) {
             const pairs = payload as Array<{ src: number; dst: number }>;
             buf.p1(pairs.length);
@@ -187,6 +188,7 @@ export function pack() {
     const spotanimNameToId = loadNameToIdMap('spotanim.pack');
     const seqNameToId = loadNameToIdMap('seq.pack');
     const textureNameToId = loadNameToIdMap('texture.pack');
+    const modelNameToId = loadNameToIdMap('model.pack');
     const spotanimLocations = loadSpotanimLocations();
     const configBlocks = readConfigFile('.spotanim');
 
@@ -224,7 +226,7 @@ export function pack() {
         if (!clientEncodedGroups.has(groupId)) clientEncodedGroups.set(groupId, new Map());
 
         try {
-            const ops = parseSpotanimFields(name, lines, { seq: seqNameToId, texture: textureNameToId });
+            const ops = parseSpotanimFields(name, lines, { seq: seqNameToId, texture: textureNameToId, model: modelNameToId });
             serverEncodedGroups.get(groupId)!.set(fileId, encodeSpotanim(ops, name));
             clientEncodedGroups.get(groupId)!.set(fileId, encodeSpotanim(ops));
         } catch (err) {

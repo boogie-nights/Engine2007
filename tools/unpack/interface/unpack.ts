@@ -913,12 +913,15 @@ function serializeComponent(
     objNames: Map<number, string>,
     componentNameMap: Map<string, string>,
     varbitNames: Map<number, string>,
-    varpNames: Map<number, string>
+    varpNames: Map<number, string>,
+    modelNames: Map<number, string>
 ): void {
     const push = (key: string, value: unknown) => {
         if (value === null || value === undefined || value === '') return;
         lines.push(`${key}=${value}`);
     };
+
+    const getModelName = (id: number): string => modelNames.get(id) ?? `model_${id}`;
 
     push('type', enumName(COMPONENT_TYPE_NAMES, c.type));
     
@@ -1019,12 +1022,12 @@ function serializeComponent(
         if (c.model1Type !== 1) {
             push('model1Type', enumName(MODEL_TYPE_NAMES, c.model1Type));
         }
-        if (c.model1Id !== -1) push('model1Id', c.model1Id);
+        if (c.model1Id !== -1) push('model1Id', getModelName(c.model1Id));
         
         if (c.model2Type !== 1) {
             push('model2Type', enumName(MODEL_TYPE_NAMES, c.model2Type));
         }
-        if (c.model2Id !== -1) push('model2Id', c.model2Id);
+        if (c.model2Id !== -1) push('model2Id', getModelName(c.model2Id));
         
         if (c.modelAnim !== -1) {
             push('modelAnim', seqNames.get(c.modelAnim) ?? `seq_${c.modelAnim}`);
@@ -1129,6 +1132,7 @@ function unpack() {
     const objNames = loadPackFile('obj.pack');
     const varbitNames = loadPackFile('varbit.pack');
     const varpNames = loadPackFile('varp.pack');
+    const modelNames = loadPackFile('model.pack');
 
     let componentNameMap = new Map<string, string>();
     try {
@@ -1212,7 +1216,7 @@ function unpack() {
                     const { comp } = decodeComponent(compData, compId + (groupId << 16));
 
                     const block: string[] = [`[${compName}]`];
-                    serializeComponent(comp, block, seqNames, objNames, componentNameMap, varbitNames, varpNames);
+                    serializeComponent(comp, block, seqNames, objNames, componentNameMap, varbitNames, varpNames, modelNames);
                     ifaceBlocks.push(block.join('\n'));
                 } catch (err) {
                     console.error(`Parsing warning on interface ${groupId}, component ${compId}:`, err);

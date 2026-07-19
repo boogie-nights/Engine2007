@@ -87,6 +87,7 @@ function parseLocOps(
         loc: Map<string, number>;
         category: Map<string, number>;
         param: Map<string, number>;
+        model: Map<string, number>;
     }
 ): LocOpcode[] {
     const ops: LocOpcode[] = [];
@@ -113,7 +114,7 @@ function parseLocOps(
 
         if ((m = key.match(/^model(\d+)$/))) {
             const parts = val.split(',');
-            const modelId = resolveNumeric(parts[0], 'model');
+            const modelId = resolveByMap(parts[0], maps.model, 'model');
             const shapeToken = parts[1] !== undefined ? parts[1].trim() : '0';
             const compact = shapeToken === 'default';
             const shape = compact ? 10 : parseInt(shapeToken, 10);
@@ -681,6 +682,7 @@ export function pack() {
         loc: loadNameToIdMap('loc.pack'),
         category: loadNameToIdMap('category.pack'),
         param: loadNameToIdMap('param.pack'),
+        model: loadNameToIdMap('model.pack'),
     };
 
     const locLocations = loadLocLocations();
