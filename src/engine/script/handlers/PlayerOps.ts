@@ -1,4 +1,4 @@
-// import IdkType from '#/cache/config/IdkType.js';
+import IdkType from '#/cache/config/IdkType.js';
 import LocType from '#/cache/config/LocType.js';
 import NpcType from '#/cache/config/NpcType.js';
 import ObjType from '#/cache/config/ObjType.js';
@@ -26,6 +26,7 @@ import {
     PlayerStatValid,
     StringNotNull,
     GenderValid,
+    IDKTypeValid,
     SkinColourValid,
     PlayerOpStateValid,
     PlayerOpIndexValid,
@@ -908,39 +909,39 @@ const PlayerOps: CommandHandlers = {
     [ScriptOpcode.SETIDKIT]: state => {
         const [idkit, color] = state.popInts(2);
 
-        // const idkType: IdkType = check(idkit, IDKTypeValid);
+        const idkType: IdkType = check(idkit, IDKTypeValid);
 
-        // let slot = idkType.type;
-        // if (state.activePlayer.gender === 1) {
-        //     slot -= 7;
-        // }
-        // state.activePlayer.body[slot] = idkType.id;
+        let slot = idkType.type;
+        if (state.activePlayer.gender === 1) {
+            slot -= 7;
+        }
+        state.activePlayer.body[slot] = idkType.id;
 
-        // // 0 - hair/jaw
-        // // 1 - torso
-        // // 2 - legs
-        // // 3 - boots
-        // // 4 - skin
-        // let type = idkType.type;
-        // if (state.activePlayer.gender === 1) {
-        //     type -= 7;
-        // }
-        // let colorSlot = -1;
-        // if (type === 0 || type === 1) {
-        //     colorSlot = 0;
-        // } else if (type === 2 || type === 3) {
-        //     colorSlot = 1;
-        // } else if (type === 4) {
-        //     /* no-op (no hand recoloring) */
-        // } else if (type === 5) {
-        //     colorSlot = 2;
-        // } else if (type === 6) {
-        //     colorSlot = 3;
-        // }
+        // 0 - hair/jaw
+        // 1 - torso
+        // 2 - legs
+        // 3 - boots
+        // 4 - skin
+        let type = idkType.type;
+        if (state.activePlayer.gender === 1) {
+            type -= 7;
+        }
+        let colorSlot = -1;
+        if (type === 0 || type === 1) {
+            colorSlot = 0;
+        } else if (type === 2 || type === 3) {
+            colorSlot = 1;
+        } else if (type === 4) {
+            /* no-op (no hand recoloring) */
+        } else if (type === 5) {
+            colorSlot = 2;
+        } else if (type === 6) {
+            colorSlot = 3;
+        }
 
-        // if (colorSlot !== -1) {
-        //     state.activePlayer.colors[colorSlot] = color;
-        // }
+        if (colorSlot !== -1) {
+            state.activePlayer.colors[colorSlot] = color;
+        }
     },
 
     [ScriptOpcode.SETGENDER]: state => {

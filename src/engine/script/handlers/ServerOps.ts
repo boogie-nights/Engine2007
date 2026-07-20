@@ -17,7 +17,7 @@ import { ScriptOpcode } from '#/engine/script/ScriptOpcode.js';
 import { ActiveNpc, ActivePlayer } from '#/engine/script/ScriptPointer.js';
 import type { CommandHandlers } from '#/engine/script/ScriptRunner.js';
 import ScriptState from '#/engine/script/ScriptState.js';
-import { check, CoordValid, HuntVisValid, MesanimValid, NumberNotNull, NumberPositive, FindSquareValid, SpotAnimTypeValid, SeqTypeValid, StructTypeValid, ParamTypeValid, LocTypeValid } from '#/engine/script/ScriptValidator.js';
+import { check, CoordValid, HuntVisValid, MesanimValid, NumberNotNull, FontTypeValid, NumberPositive, FindSquareValid, SpotAnimTypeValid, SeqTypeValid, StructTypeValid, ParamTypeValid, LocTypeValid } from '#/engine/script/ScriptValidator.js';
 import World from '#/engine/World.js';
 import Environment from '#/util/Environment.js';
 
@@ -204,25 +204,25 @@ const ServerOps: CommandHandlers = {
     },
 
     [ScriptOpcode.SPLIT_INIT]: state => {
-        // const [maxWidth, linesPerPage, fontId] = state.popInts(3);
-        // let text = state.popString();
+        const [maxWidth, linesPerPage, fontId] = state.popInts(3);
+        let text = state.popString();
 
-        // const font = check(fontId, FontTypeValid);
+        const font = check(fontId, FontTypeValid);
 
-        // // todo: later this needs to lookup by <p=id> instead of <p,name>
-        // if (text.startsWith('<p,') && text.indexOf('>') !== -1) {
-        //     const mesanim = text.substring(3, text.indexOf('>'));
-        //     state.splitMesanim = MesanimType.getId(mesanim);
-        //     text = text.substring(text.indexOf('>') + 1);
-        // } else {
-        //     state.splitMesanim = -1;
-        // }
+        // todo: later this needs to lookup by <p=id> instead of <p,name>
+        if (text.startsWith('<p,') && text.indexOf('>') !== -1) {
+            const mesanim = text.substring(3, text.indexOf('>'));
+            state.splitMesanim = MesanimType.getId(mesanim);
+            text = text.substring(text.indexOf('>') + 1);
+        } else {
+            state.splitMesanim = -1;
+        }
 
-        // state.splitPages = [];
-        // const lines = font.split(text, maxWidth);
-        // while (lines.length > 0) {
-        //     state.splitPages.push(lines.splice(0, linesPerPage));
-        // }
+        state.splitPages = [];
+        const lines = font.split(text, maxWidth);
+        while (lines.length > 0) {
+            state.splitPages.push(lines.splice(0, linesPerPage));
+        }
     },
 
     [ScriptOpcode.SPLIT_GET]: state => {

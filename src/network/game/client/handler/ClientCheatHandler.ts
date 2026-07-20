@@ -22,6 +22,7 @@ import Loc from '#/engine/entity/Loc.ts';
 import { EntityLifeCycle } from '#/engine/entity/EntityLifeCycle.ts';
 import { LocShape } from '@2004scape/rsmod-pathfinder';
 import { LocAngle } from '@2004scape/rsmod-pathfinder';
+import IdkType from '#/cache/config/IdkType.ts';
 
 export default class ClientCheatHandler extends ClientGameMessageHandler<ClientCheat> {
     handle(message: ClientCheat, player: NetworkPlayer): boolean {
@@ -104,11 +105,11 @@ export default class ClientCheatHandler extends ClientGameMessageHandler<ClientC
                             //     params[i] = SpotanimType.getId(name ?? '');
                             //     break;
                             // }
-                            // case ScriptVarType.IDKIT: {
-                            //     const name = args.shift();
-                            //     params[i] = IdkType.getId(name ?? '');
-                            //     break;
-                            // }
+                            case ScriptVarType.IDKIT: {
+                                const name = args.shift();
+                                params[i] = IdkType.getId(name ?? '');
+                                break;
+                            }
                         }
                     } catch (_) {
                         // invalid arguments

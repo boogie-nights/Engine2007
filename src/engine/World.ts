@@ -13,9 +13,9 @@ import Component from '#/cache/config/Component.js';
 import DbRowType from '#/cache/config/DbRowType.js';
 import DbTableType from '#/cache/config/DbTableType.js';
 import EnumType from '#/cache/config/EnumType.js';
-// import FontType from '#/cache/config/FontType.js';
+import FontType from '#/cache/config/FontType.js';
 import HuntType from '#/cache/config/HuntType.js';
-// import IdkType from '#/cache/config/IdkType.js';
+import IdkType from '#/cache/config/IdkType.js';
 import InvType from '#/cache/config/InvType.js';
 import LocType from '#/cache/config/LocType.js';
 import MesAnimType from '#/cache/config/MesAnimType.js';
@@ -231,7 +231,6 @@ class World {
     }
 
     reload(clearInvs: boolean = true): void {
-        // IdkType.load('data/pack');
         CategoryType.load('data/pack');
         HuntType.load('data/pack');
         VarNpcType.load('data/pack');
@@ -315,6 +314,11 @@ class World {
             ObjType.load(objIndex);
         }
 
+        const idkIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [3]);
+        if (idkIndex) {
+            IdkType.load(idkIndex);
+        }
+
         const invIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [5]);
         if (invIndex) {
             InvType.load(invIndex);
@@ -377,7 +381,12 @@ class World {
         }
 
         if (!Environment.STANDALONE_BUNDLE) {
-            // FontType.load('data/pack');
+            const spriteIndex = await OpenRs2.RS2_500.loadArchiveIndexWithGroups(8); // todo unpack and pack these
+            const metricsIndex = await OpenRs2.RS2_500.loadArchiveIndexWithGroups(13);
+            if (spriteIndex && metricsIndex) {
+                FontType.load(spriteIndex, metricsIndex);
+            }
+
             // WordEnc.load('data/pack');
 
             this.reload();

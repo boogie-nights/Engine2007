@@ -5,7 +5,7 @@ import { Visibility } from '#/network/rsbuf/visibility.ts';
 import { CollisionType, CollisionFlag } from '@2004scape/rsmod-pathfinder';
 
 import Component, { IfType } from '#/cache/config/Component.js';
-// import FontType from '#/cache/config/FontType.js';
+import FontType from '#/cache/config/FontType.js';
 import InvType from '#/cache/config/InvType.js';
 import LocType from '#/cache/config/LocType.js';
 import NpcType from '#/cache/config/NpcType.js';
@@ -2060,11 +2060,11 @@ export default class Player extends PathingEntity {
     wrappedMessageGame(mes: string) {
         this.messageGame(mes);
 
-        // const font = FontType.get(1);
-        // const lines = font.split(mes, 456);
-        // for (const line of lines) {
-        //     this.messageGame(line);
-        // }
+        const font = FontType.get(1);
+        const lines = font.split(mes, 456);
+        for (const line of lines) {
+            this.messageGame(line);
+        }
     }
 
     write(message: ServerGameMessage) {

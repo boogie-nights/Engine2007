@@ -5,9 +5,9 @@ import { ConfigType } from '#/cache/config/ConfigType.js';
 import DbRowType from '#/cache/config/DbRowType.js';
 import DbTableType from '#/cache/config/DbTableType.js';
 import EnumType from '#/cache/config/EnumType.js';
-// import FontType from '#/cache/config/FontType.js';
+import FontType, { ServerFont } from '#/cache/config/FontType.js';
 import HuntType from '#/cache/config/HuntType.js';
-// import IdkType from '#/cache/config/IdkType.js';
+import IdkType from '#/cache/config/IdkType.js';
 import InvType from '#/cache/config/InvType.js';
 import LocType from '#/cache/config/LocType.js';
 import MesanimType from '#/cache/config/MesAnimType.js';
@@ -55,7 +55,7 @@ class ScriptInputStringNotNullValidator implements ScriptValidator<string, strin
     }
 }
 
-class ScriptInputConfigTypeValidator<T extends ConfigType> implements ScriptValidator<number, T> { // todo font type
+class ScriptInputConfigTypeValidator<T extends ConfigType | ServerFont> implements ScriptValidator<number, T> {
     private readonly type: (input: number) => T;
     private readonly count: (input: number) => boolean;
     private readonly name: string;
@@ -122,7 +122,7 @@ export const ObjTypeValid: ScriptValidator<number, ObjType> = new ScriptInputCon
 export const ObjStackValid: ScriptValidator<number, number> = new ScriptInputRangeValidator(1, Inventory.STACK_LIMIT, 'ObjStack');
 export const InvTypeValid: ScriptValidator<number, InvType> = new ScriptInputConfigTypeValidator(InvType.get, (input: number) => input >= 0 && input < InvType.count, 'Inv');
 export const CategoryTypeValid: ScriptValidator<number, CategoryType> = new ScriptInputConfigTypeValidator(CategoryType.get, (input: number) => input >= 0 && input < CategoryType.count, 'Cat');
-// export const IDKTypeValid: ScriptValidator<number, IdkType> = new ScriptInputConfigTypeValidator(IdkType.get, (input: number) => input >= 0 && input < IdkType.count, 'Idk');
+export const IDKTypeValid: ScriptValidator<number, IdkType> = new ScriptInputConfigTypeValidator(IdkType.get, (input: number) => input >= 0 && input < IdkType.count, 'Idk');
 export const HuntVisValid: ScriptValidator<number, HuntVis> = new ScriptInputRangeValidator(HuntVis.OFF, HuntVis.LINEOFWALK, 'HuntVis');
 export const FindSquareValid: ScriptValidator<number, MapFindSquareType> = new ScriptInputRangeValidator(MapFindSquareType.LINEOFWALK, MapFindSquareType.NONE, 'FindSquare');
 export const SeqTypeValid: ScriptValidator<number, SeqType> = new ScriptInputConfigTypeValidator(SeqType.get, (input: number) => input >= 0 && input < SeqType.count, 'Seq');
@@ -130,7 +130,7 @@ export const VarPlayerValid: ScriptValidator<number, VarPlayerType> = new Script
 export const VarBitValid: ScriptValidator<number, VarBitType> = new ScriptInputConfigTypeValidator(VarBitType.get, (input: number) => input >= 0 && input < VarBitType.count, 'VarBit');
 export const VarNpcValid: ScriptValidator<number, VarNpcType> = new ScriptInputConfigTypeValidator(VarNpcType.get, (input: number) => input >= 0 && input < VarNpcType.count, 'Varn');
 export const VarSharedValid: ScriptValidator<number, VarSharedType> = new ScriptInputConfigTypeValidator(VarSharedType.get, (input: number) => input >= 0 && input < VarSharedType.count, 'Vars');
-// export const FontTypeValid: ScriptValidator<number, FontType> = new ScriptInputConfigTypeValidator(FontType.get, (input: number) => input >= 0 && input < FontType.count, 'Font');
+export const FontTypeValid: ScriptValidator<number, ServerFont> = new ScriptInputConfigTypeValidator(FontType.get, (input: number) => input >= 0 && input < FontType.count, 'Font');
 export const MesanimValid: ScriptValidator<number, MesanimType> = new ScriptInputConfigTypeValidator(MesanimType.get, (input: number) => input >= 0 && input < MesanimType.count, 'Mesanim');
 export const StructTypeValid: ScriptValidator<number, StructType> = new ScriptInputConfigTypeValidator(StructType.get, (input: number) => input >= 0 && input < StructType.count, 'Struct');
 export const DbRowTypeValid: ScriptValidator<number, DbRowType> = new ScriptInputConfigTypeValidator(DbRowType.get, (input: number) => input >= 0 && input < DbRowType.count, 'Dbrow');
