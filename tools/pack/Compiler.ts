@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { CompileServerScript } from '@lostcityrs/runescript';
+import { CompileServerScript } from '#/runescript/runescript.js';
 
 import Component from '#/cache/config/Component.js';
 import DbTableType from '#/cache/config/DbTableType.js';
@@ -200,6 +200,7 @@ export async function runServerCompiler() {
     const dbcolumnInfo = new CompilerTypeInfo();
     const dbrowInfo = CompilerTypeInfo.load(`${Environment.BUILD_SRC_DIR}/pack/dbrow.pack`);
     const midiInfo = CompilerTypeInfo.load(`${Environment.BUILD_SRC_DIR}/pack/midi.pack`);
+    const clientScriptInfo = CompilerTypeInfo.load(`${Environment.BUILD_SRC_DIR}/pack/clientscript.pack`);
 
     const configIndex = await OpenRs2.RS2_500.loadLocalPackedIndex(2, [5]);
     if (configIndex) {
@@ -374,6 +375,8 @@ export async function runServerCompiler() {
             'npc_mode': npcModeInfo,
             'fontmetrics': fontmetricsInfo,
             'locshape': locshapeInfo,
+
+            'clientscript': clientScriptInfo
         },
         writer: {
             js5: {

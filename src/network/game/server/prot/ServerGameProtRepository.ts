@@ -43,6 +43,8 @@ import UpdateZonePartialEnclosed from '#/network/game/server/model/UpdateZonePar
 import UpdateZonePartialEnclosedEncoder from '#/network/game/server/codec/UpdateZonePartialEnclosedEncoder.ts';
 import UpdateZonePartialFollows from '#/network/game/server/model/UpdateZonePartialFollows.ts';
 import UpdateZonePartialFollowsEncoder from '#/network/game/server/codec/UpdateZonePartialFollowsEncoder.ts';
+import RunClientScript from '#/network/game/server/model/RunClientScript.ts';
+import RunClientScriptEncoder from '#/network/game/server/codec/RunClientScriptEncoder.ts';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type GenericOutgoingMessage<T extends ServerGameMessage> = new (...args: any[]) => T;
@@ -86,6 +88,7 @@ class ServerGameProtRepository {
         this.bind(UpdateZoneFullFollows, new UpdateZoneFullFollowsEncoder());
         this.bind(UpdateZonePartialEnclosed, new UpdateZonePartialEnclosedEncoder());
         this.bind(UpdateZonePartialFollows, new UpdateZonePartialFollowsEncoder());
+        this.bind(RunClientScript, new RunClientScriptEncoder());
     }
 }
 

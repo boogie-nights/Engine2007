@@ -10,8 +10,7 @@ export default class UpdateInvFullEncoder extends ServerGameMessageEncoder<Updat
     encode(buf: Packet, message: UpdateInvFull) {
         const { component, inv } = message;
 
-        const comType = Component.get(component);
-        const size = Math.min(inv.capacity, comType.width * comType.height);
+        const size = component === -1 ? inv.capacity : Math.min(inv.capacity, Component.get(component).width * Component.get(component).height);
 
         buf.p4(component);
         buf.p2(inv.type);

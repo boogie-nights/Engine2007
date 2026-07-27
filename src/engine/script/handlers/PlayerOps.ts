@@ -42,6 +42,7 @@ import SynthSound from '#/network/game/server/model/SynthSound.js';
 import Environment from '#/util/Environment.js';
 // import SetPlayerOp from '#/network/game/server/model/SetPlayerOp.js';
 import JavaRandom from '#/util/JavaRandom.js';
+import RunClientScript from '#/network/game/server/model/RunClientScript.ts';
 
 const PlayerOps: CommandHandlers = {
     [ScriptOpcode.FINDUID]: state => {
@@ -1071,6 +1072,12 @@ const PlayerOps: CommandHandlers = {
         check(primary, PlayerOpStateValid);
         
         // state.activePlayer.write(new SetPlayerOp(index, text, primary));
+    }),
+
+    [ScriptOpcode.RUNCLIENTSCRIPT]: checkedHandler(ActivePlayer, state => {
+        const args = popScriptArgs(state);
+        const scriptId = state.popInt();
+        state.activePlayer.write(new RunClientScript(scriptId, args));
     }),
 
     [ScriptOpcode.IF_OPENTOP]: state => {

@@ -10,7 +10,6 @@
         "@fastify/view": "^10.0.1",
         "@jimp/js-png": "1.6.1",
         "@jimp/plugin-quantize": "1.6.1",
-        "@lostcityrs/runescript": "^0.9.6",
         "axios": "^1.7.8",
         "dotenv": "^16.4.7",
         "ejs": "^3.1.10",
@@ -174,8 +173,6 @@
     "@jimp/types": ["@jimp/types@1.6.1", "", { "dependencies": { "zod": "^3.23.8" } }, "sha512-leI7YbveTNi565m910XgIOwXyuu074H5qazAD1357HImJSv2hqxnWXpwxQbadGWZ7goZRYBDZy5lpqud0p7q5w=="],
 
     "@jimp/utils": ["@jimp/utils@1.6.1", "", { "dependencies": { "@jimp/types": "1.6.1", "tinycolor2": "^1.6.0" } }, "sha512-veFPRd93FCnS7AgmCkPgARVGoDRrJ9cm1ujuNyA+UfQ5VKbED2002sm5XfFLFwTsKC8j04heTrwe+tU1dluXOw=="],
-
-    "@lostcityrs/runescript": ["@lostcityrs/runescript@0.9.6", "", {}, "sha512-j0P6mT86SXlX6znLJvfVPIkDGRv5xSMCACZ6J7w520+sxOqon1N6M62pGK1/Xg1ptByVwW82vL2P/RR7U6gxdA=="],
 
     "@lukeed/ms": ["@lukeed/ms@2.0.2", "", {}, "sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA=="],
 

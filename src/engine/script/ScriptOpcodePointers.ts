@@ -504,6 +504,9 @@ const ScriptOpcodePointers: {
     [ScriptOpcode.IF_CLOSESUB]: {
         require: ['active_player']
     },
+    [ScriptOpcode.RUNCLIENTSCRIPT]: {
+        require: ['active_player']
+    },
 
     // Npc ops
     [ScriptOpcode.NPC_ADD]: {

@@ -28,6 +28,8 @@ export default class ServerGameProt {
     static readonly UPDATE_ZONE_PARTIAL_FOLLOWS = new ServerGameProt(163, 2);
     static readonly UPDATE_ZONE_PARTIAL_ENCLOSED = new ServerGameProt(134, -2);
 
+    static readonly RUNCLIENTSCRIPT = new ServerGameProt(53, -2);
+
     constructor(
         readonly id: number,
         readonly length: number

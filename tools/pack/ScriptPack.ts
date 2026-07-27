@@ -61,6 +61,11 @@ function crawlScriptNames(): string[] {
             // compiler type-signature declarations only, not real scripts
             return;
         }
+        
+        if (file === `${Environment.BUILD_SRC_DIR}/scripts/clientscript.rs2`) {
+            // compiler type-signature declarations only, not real scripts
+            return;
+        }
 
         for (const line of lines) {
             if (line.startsWith('[')) {

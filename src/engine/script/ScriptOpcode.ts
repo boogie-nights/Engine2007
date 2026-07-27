@@ -199,6 +199,7 @@ export const enum ScriptOpcode {
     MINIMAP_TOGGLE,
     IF_SETSCROLLPOS, // official, see server packets
     SET_PLAYER_OP, // todo: real name?
+    RUNCLIENTSCRIPT,
     IF_OPENTOP,
     IF_OPENSUB,
     IF_CLOSESUB,
@@ -628,6 +629,7 @@ export const ScriptOpcodeMap: Map<string, number> = new Map([
     ['UID', ScriptOpcode.UID],
     ['WEAKQUEUE', ScriptOpcode.WEAKQUEUE],
     ['SET_PLAYER_OP', ScriptOpcode.SET_PLAYER_OP],
+    ['RUNCLIENTSCRIPT', ScriptOpcode.RUNCLIENTSCRIPT],
     ['IF_OPENTOP', ScriptOpcode.IF_OPENTOP],
     ['IF_OPENSUB', ScriptOpcode.IF_OPENSUB],
     ['IF_CLOSESUB', ScriptOpcode.IF_CLOSESUB],
